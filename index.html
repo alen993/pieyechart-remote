@@ -21,7 +21,7 @@
   --amber: #f59e0b;
   --text: #e2e8f0;
   --text2: #94a3b8;
-  --radius: 14px;
+  --radius: 10px;
   --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
@@ -45,269 +45,162 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 8px 12px;
   background: var(--surface);
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(20px);
 }
-.conn-bar .logo {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-.conn-bar .logo span { color: var(--accent); }
-.conn-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text2);
-}
-.conn-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--red);
-  transition: background 0.3s;
-}
-.conn-dot.connected { background: var(--green); }
+.logo { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+.logo span { color: var(--accent2); }
+.conn-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+.conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; }
+.conn-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
 .conn-dot.connecting { background: var(--amber); animation: pulse 1s infinite; }
 @keyframes pulse { 50% { opacity: 0.4; } }
-
 .conn-btn {
+  padding: 6px 14px;
   background: var(--accent);
   border: none;
-  color: white;
-  padding: 6px 14px;
   border-radius: 20px;
+  color: white;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
-.conn-btn:active { transform: scale(0.95); }
 .conn-btn.disconnect { background: var(--red); }
 
-/* === Tab Navigation === */
+/* === Examiner Display === */
+.exam-display {
+  margin: 6px 10px;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+.exam-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+.exam-letters { font-size: 22px; font-weight: 700; letter-spacing: 8px; padding: 4px 0; min-height: 32px; }
+.exam-footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+/* === Tabs === */
 .tabs {
   display: flex;
+  padding: 0 10px;
+  gap: 2px;
   background: var(--surface);
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-.tabs::-webkit-scrollbar { display: none; }
 .tab {
   flex: 1;
-  min-width: fit-content;
-  padding: 10px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text2);
-  text-align: center;
-  border: none;
+  padding: 8px 0;
   background: none;
-  cursor: pointer;
+  border: none;
   border-bottom: 2px solid transparent;
-  white-space: nowrap;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s;
 }
-.tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
+.tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
 
 /* === Panels === */
-.panel { display: none; padding: 8px 10px; padding-bottom: calc(8px + var(--safe-b)); }
+.panel { display: none; padding: 6px 10px; }
 .panel.active { display: block; }
 
-/* === Button Grid === */
 .section-title {
   font-size: 10px;
   font-weight: 700;
-  color: var(--text2);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin: 8px 0 4px;
+  letter-spacing: 1px;
+  color: var(--text2);
+  margin: 6px 0 4px;
 }
-.section-title:first-child { margin-top: 2px; }
 
-.btn-grid {
-  display: grid;
-  gap: 5px;
-}
-.btn-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-.btn-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-.btn-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-.btn-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+/* === Button Grids === */
+.btn-grid { display: grid; gap: 4px; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.cols-5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
 
 .cmd-btn {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 4px;
+  padding: 6px 4px;
+  min-height: 34px;
   background: var(--surface2);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
+  border-radius: 8px;
   color: var(--text);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  min-height: 40px;
-  position: relative;
-  overflow: hidden;
 }
-.cmd-btn:active {
-  transform: scale(0.94);
-  background: var(--accent);
-  border-color: var(--accent);
-}
-.cmd-btn .icon {
-  font-size: 16px;
-  margin-bottom: 2px;
-}
-.cmd-btn .sub {
-  font-size: 9px;
-  color: var(--text2);
-  margin-top: 2px;
-}
-.cmd-btn:active .sub { color: rgba(255,255,255,0.7); }
-
-/* Special button colors */
+.cmd-btn:active { transform: scale(0.95); background: var(--accent); }
 .cmd-btn.yes { border-color: rgba(34,197,94,0.3); color: var(--green); }
-.cmd-btn.yes:active { background: var(--green); color: white; }
 .cmd-btn.no { border-color: rgba(239,68,68,0.3); color: var(--red); }
-.cmd-btn.no:active { background: var(--red); color: white; }
-.cmd-btn.accent { border-color: rgba(99,102,241,0.3); color: var(--accent2); }
-.cmd-btn.accent:active { background: var(--accent); color: white; }
+.cmd-btn.accent { background: var(--accent); }
 
-/* === D-Pad === */
-.dpad-container {
-  display: flex;
-  justify-content: center;
-  padding: 8px 0;
-}
+/* === D-pad === */
+.dpad-container { display: flex; justify-content: center; padding: 4px 0; }
 .dpad {
   display: grid;
-  grid-template-columns: 56px 56px 56px;
-  grid-template-rows: 56px 56px 56px;
-  gap: 5px;
+  grid-template-columns: 44px 44px 44px;
+  grid-template-rows: 44px 44px 44px;
+  gap: 3px;
 }
-.dpad .cmd-btn { border-radius: 16px; min-height: unset; }
-.dpad .center {
-  background: var(--accent);
-  border-color: var(--accent);
-  font-weight: 800;
-  font-size: 14px;
-}
-.dpad .center:active { background: #4f46e5; }
-.dpad .empty { background: transparent; border: none; pointer-events: none; }
+.dpad .cmd-btn { min-height: 44px; font-size: 16px; border-radius: 8px; }
+.dpad .center { background: var(--accent); font-size: 12px; font-weight: 800; border-radius: 50%; }
+.empty { background: transparent; border: none; }
 
-/* === Acuity Buttons === */
+/* === Acuity Grid === */
 .acuity-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 4px;
 }
 .acuity-btn {
-  padding: 12px 4px;
+  position: relative;
+  overflow: hidden;
+  padding: 6px 2px;
+  min-height: 34px;
   background: var(--surface2);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 14px;
+  border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 8px;
+  color: var(--accent2);
+  font-size: 13px;
   font-weight: 700;
   text-align: center;
   cursor: pointer;
   transition: all 0.15s;
 }
-.acuity-btn:active {
-  transform: scale(0.94);
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-/* === Examiner Display === */
-.exam-display {
-  background: var(--surface);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius);
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-.exam-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  background: rgba(99,102,241,0.08);
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-.exam-test-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent2);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.exam-acuity {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--green);
-}
-.exam-letters {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 6px 12px;
-  gap: 8px;
-}
-.exam-letters .letter {
-  font-family: 'Optician Sans', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: 6px;
-}
-.exam-letters .no-data {
-  font-size: 13px;
-  color: var(--text2);
-  font-style: italic;
-}
-.exam-footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 14px;
-  font-size: 10px;
-  color: var(--text2);
-  border-top: 1px solid rgba(255,255,255,0.04);
-}
+.acuity-btn:active { transform: scale(0.95); background: var(--accent); color: white; }
 
 /* === Toast === */
 .toast {
   position: fixed;
-  bottom: calc(80px + var(--safe-b));
+  bottom: 80px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background: var(--surface2);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text);
+  transform: translateX(-50%) translateY(20px);
   padding: 10px 20px;
-  border-radius: 24px;
+  background: rgba(30,30,50,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  color: var(--text);
   font-size: 13px;
-  font-weight: 500;
   opacity: 0;
   transition: all 0.3s;
   z-index: 200;
   pointer-events: none;
 }
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* === Ripple effect === */
+/* === Ripple === */
 .ripple {
   position: absolute;
   border-radius: 50%;
@@ -318,12 +211,10 @@ body {
 }
 @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
 
-/* === Landscape optimization === */
 @media (orientation: landscape) {
-  .panel { padding: 8px 16px; }
-  .dpad-container { padding: 10px 0; }
-  .dpad { grid-template-columns: 56px 56px 56px; grid-template-rows: 56px 56px 56px; }
-  .cmd-btn { padding: 10px 6px; min-height: 46px; }
+  .panel { padding: 4px 12px; }
+  .dpad { grid-template-columns: 40px 40px 40px; grid-template-rows: 40px 40px 40px; }
+  .cmd-btn { padding: 4px 3px; min-height: 30px; }
 }
 </style>
 </head>
@@ -342,11 +233,11 @@ body {
 <!-- Examiner Display -->
 <div class="exam-display" id="examDisplay">
   <div class="exam-header">
-    <span class="exam-test-name" id="examTestName">---</span>
-    <span class="exam-acuity" id="examAcuity">---</span>
+    <span id="examTestName">---</span>
+    <span id="examAcuity">---</span>
   </div>
   <div class="exam-letters">
-    <span class="letter" id="examLetters"><span class="no-data">Waiting for display...</span></span>
+    <span id="examLetters"><span style="color:var(--text2);font-size:13px;letter-spacing:3px;">Waiting for display...</span></span>
   </div>
   <div class="exam-footer">
     <span id="examMode">---</span>
@@ -356,190 +247,103 @@ body {
 
 <!-- Tabs -->
 <div class="tabs">
-  <button class="tab active" data-panel="nav">Navigate</button>
+  <button class="tab active" data-panel="main">Main</button>
   <button class="tab" data-panel="tests">Tests</button>
-  <button class="tab" data-panel="acuity">Acuity</button>
-  <button class="tab" data-panel="special">Special</button>
   <button class="tab" data-panel="settings">Settings</button>
 </div>
 
-<!-- ============ NAVIGATE PANEL ============ -->
-<div class="panel active" id="panel-nav">
-  <div class="section-title">Confirm / Cancel</div>
-  <div class="btn-grid cols-2">
-    <button class="cmd-btn yes" data-cmd="OUI"><span class="icon">&#10003;</span>YES</button>
-    <button class="cmd-btn no" data-cmd="NON"><span class="icon">&#10007;</span>NO</button>
+<!-- ============ MAIN PANEL ============ -->
+<div class="panel active" id="panel-main">
+  <div class="btn-grid cols-2" style="margin-bottom:4px;">
+    <button class="cmd-btn yes" data-cmd="OUI">&#10003; YES</button>
+    <button class="cmd-btn no" data-cmd="NON">&#10007; NO</button>
   </div>
 
-  <div class="section-title">Navigation</div>
   <div class="dpad-container">
     <div class="dpad">
       <div class="empty"></div>
-      <button class="cmd-btn" data-cmd="UP"><span class="icon">&#9650;</span></button>
+      <button class="cmd-btn" data-cmd="UP">&#9650;</button>
       <div class="empty"></div>
-      <button class="cmd-btn" data-cmd="LEFT"><span class="icon">&#9664;</span></button>
+      <button class="cmd-btn" data-cmd="LEFT">&#9664;</button>
       <button class="cmd-btn center" data-cmd="CHG">CHG</button>
-      <button class="cmd-btn" data-cmd="RIGHT"><span class="icon">&#9654;</span></button>
+      <button class="cmd-btn" data-cmd="RIGHT">&#9654;</button>
       <div class="empty"></div>
-      <button class="cmd-btn" data-cmd="DOWN"><span class="icon">&#9660;</span></button>
+      <button class="cmd-btn" data-cmd="DOWN">&#9660;</button>
       <div class="empty"></div>
     </div>
   </div>
 
   <div class="section-title">Display</div>
   <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="RV"><span class="icon">&#127752;</span>R/G</button>
-    <button class="cmd-btn" data-cmd="INV"><span class="icon">&#9680;</span>B/W</button>
-    <button class="cmd-btn" data-cmd="NRL"><span class="icon">&#9681;</span>Normal</button>
+    <button class="cmd-btn" data-cmd="RV">R/G</button>
+    <button class="cmd-btn" data-cmd="INV">B/W</button>
+    <button class="cmd-btn" data-cmd="NRL">Normal</button>
+  </div>
+
+  <div class="section-title">Acuity</div>
+  <div class="acuity-grid">
+    <button class="acuity-btn" data-cmd="A005">0.05</button>
+    <button class="acuity-btn" data-cmd="A010">0.1</button>
+    <button class="acuity-btn" data-cmd="A020">0.2</button>
+    <button class="acuity-btn" data-cmd="A025">0.25</button>
+    <button class="acuity-btn" data-cmd="A030">0.3</button>
+    <button class="acuity-btn" data-cmd="A040">0.4</button>
+    <button class="acuity-btn" data-cmd="A050">0.5</button>
+    <button class="acuity-btn" data-cmd="A070">0.7</button>
+    <button class="acuity-btn" data-cmd="A080">0.8</button>
+    <button class="acuity-btn" data-cmd="A100">1.0</button>
+    <button class="acuity-btn" data-cmd="A120">1.2</button>
+    <button class="acuity-btn" data-cmd="A200">2.0</button>
   </div>
 
   <div class="section-title">Layout</div>
-  <div class="btn-grid cols-3">
+  <div class="btn-grid cols-4">
     <button class="cmd-btn" data-cmd="MSN">Single</button>
-    <button class="cmd-btn" data-cmd="MLN">1 Row</button>
+    <button class="cmd-btn" data-cmd="MLN">Row</button>
     <button class="cmd-btn" data-cmd="M3L">3 Rows</button>
-  </div>
-  <div class="btn-grid cols-3" style="margin-top:8px">
     <button class="cmd-btn" data-cmd="MCP">Column</button>
-    <button class="cmd-btn" data-cmd="M3P">3 Panel</button>
-    <button class="cmd-btn" data-cmd="MCS">Col Split</button>
   </div>
 </div>
 
 <!-- ============ TESTS PANEL ============ -->
 <div class="panel" id="panel-tests">
-  <div class="section-title">Acuity Charts</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="OAL"><span class="icon">A</span>Letters</button>
-    <button class="cmd-btn" data-cmd="OCH"><span class="icon">1</span>Numbers</button>
-    <button class="cmd-btn" data-cmd="OSN"><span class="icon">E</span>Tumbling E</button>
-    <button class="cmd-btn" data-cmd="OLN"><span class="icon">C</span>Landolt C</button>
-    <button class="cmd-btn" data-cmd="OIM"><span class="icon">&#9786;</span>Children</button>
-    <button class="cmd-btn" data-cmd="OFM"><span class="icon">&#9632;</span>Geometric</button>
+  <div class="section-title">Optotype</div>
+  <div class="btn-grid cols-5">
+    <button class="cmd-btn" data-cmd="OAL">Letters</button>
+    <button class="cmd-btn" data-cmd="OCH">Numbers</button>
+    <button class="cmd-btn" data-cmd="OSN">E</button>
+    <button class="cmd-btn" data-cmd="OLN">C</button>
+    <button class="cmd-btn" data-cmd="OIM">Child</button>
   </div>
 
-  <div class="section-title">ETDRS</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="EDRSG">ETDRS G</button>
-    <button class="cmd-btn" data-cmd="EDRSD">ETDRS D</button>
-    <button class="cmd-btn" data-cmd="EDRSR">ETDRS R</button>
-  </div>
-
-  <div class="section-title">Binocular / Phoria</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="WOR"><span class="icon">&#9673;</span>Worth 4</button>
-    <button class="cmd-btn" data-cmd="STR"><span class="icon">&#9670;</span>Stereo</button>
-    <button class="cmd-btn" data-cmd="SCH"><span class="icon">&#10023;</span>Schober</button>
-    <button class="cmd-btn" data-cmd="MPT">Phoria</button>
-    <button class="cmd-btn" data-cmd="JAC">Jackson</button>
-    <button class="cmd-btn" data-cmd="OXO">OXO</button>
-  </div>
-
-  <div class="section-title">Balance</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="BRV">R/G Bal</button>
-    <button class="cmd-btn" data-cmd="BPOL">Pol Bal</button>
-    <button class="cmd-btn" data-cmd="BALANCEBIN">Bino Bal</button>
-    <button class="cmd-btn" data-cmd="BDP1">Duo P1</button>
-    <button class="cmd-btn" data-cmd="BDP2">Duo P2</button>
-  </div>
-
-  <div class="section-title">Clock / Astigmatism</div>
+  <div class="section-title">Groups</div>
   <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="CPT">Clock</button>
-    <button class="cmd-btn" data-cmd="AST01">Astig 1</button>
-    <button class="cmd-btn" data-cmd="AST02">Astig 2</button>
-    <button class="cmd-btn" data-cmd="ANC">Aniseic</button>
-  </div>
-</div>
-
-<!-- ============ ACUITY PANEL ============ -->
-<div class="panel" id="panel-acuity">
-  <div class="section-title">Direct Acuity Jump</div>
-  <div class="acuity-grid">
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.05">0.05<br><small>6/120</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.1">0.1<br><small>6/60</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.2">0.2<br><small>6/30</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.25">0.25<br><small>6/24</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.3">0.3<br><small>6/20</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.4">0.4<br><small>6/15</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.5">0.5<br><small>6/12</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.7">0.7<br><small>6/8.5</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="0.8">0.8<br><small>6/7.5</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="1.0">1.0<br><small>6/6</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="1.2">1.2<br><small>6/5</small></button>
-    <button class="acuity-btn" data-cmd="UP" data-acuity="1.5">1.5<br><small>6/4</small></button>
+    <button class="cmd-btn" data-cmd="G1">G1</button>
+    <button class="cmd-btn" data-cmd="G2">G2</button>
+    <button class="cmd-btn" data-cmd="G3">G3</button>
+    <button class="cmd-btn accent" data-cmd="TESTS">Tests</button>
   </div>
 
-  <div class="section-title">Quick Navigate</div>
+  <div class="section-title">Cylinder / Astigmatism</div>
   <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="UPFAST"><span class="icon">&#9650;&#9650;</span>Up Fast</button>
-    <button class="cmd-btn" data-cmd="UP"><span class="icon">&#9650;</span>Up</button>
-    <button class="cmd-btn" data-cmd="DOWN"><span class="icon">&#9660;</span>Down</button>
-    <button class="cmd-btn" data-cmd="DOWNFAST"><span class="icon">&#9660;&#9660;</span>Down Fast</button>
+    <button class="cmd-btn" data-cmd="XCL">XCYL</button>
+    <button class="cmd-btn" data-cmd="CPT">ASTIG</button>
+    <button class="cmd-btn" data-cmd="WOR">Worth</button>
+    <button class="cmd-btn" data-cmd="SHN">SHO</button>
   </div>
 
-  <div class="section-title">Contrast</div>
-  <div class="btn-grid cols-2">
-    <button class="cmd-btn" data-cmd="LEFT"><span class="icon">&#9664;</span>Less Contrast</button>
-    <button class="cmd-btn" data-cmd="RIGHT"><span class="icon">&#9654;</span>More Contrast</button>
-  </div>
-</div>
-
-<!-- ============ SPECIAL PANEL ============ -->
-<div class="panel" id="panel-special">
-  <div class="section-title">Vision Tests</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="ISH"><span class="icon">&#127912;</span>Color Vision</button>
-    <button class="cmd-btn" data-cmd="PEL"><span class="icon">&#9635;</span>Contrast Sens</button>
-    <button class="cmd-btn" data-cmd="VEI"><span class="icon">&#9788;</span>Veil / Glare</button>
-    <button class="cmd-btn" data-cmd="SHN">Sheridan</button>
-    <button class="cmd-btn" data-cmd="PIC"><span class="icon">&#9881;</span>Pictures</button>
-    <button class="cmd-btn" data-cmd="MOV"><span class="icon">&#9654;</span>Video</button>
-  </div>
-
-  <div class="section-title">Polarized / 3D</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="ACP">Acuity Pol</button>
-    <button class="cmd-btn" data-cmd="ACP3D">Acuity 3D</button>
-    <button class="cmd-btn" data-cmd="PSKL3D">Image 3D</button>
-  </div>
-
-  <div class="section-title">Dazzle / Glare</div>
-  <div class="btn-grid cols-3">
-    <button class="cmd-btn" data-cmd="DZLHAL">Halo</button>
-    <button class="cmd-btn" data-cmd="DZLREC">Recovery</button>
-    <button class="cmd-btn" data-cmd="DZLDRV">Driver</button>
-  </div>
-
-  <div class="section-title">Fixation / Fusion</div>
+  <div class="section-title">Special</div>
   <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="PTX">Fixation</button>
-    <button class="cmd-btn" data-cmd="FUSV">Fusion V</button>
-    <button class="cmd-btn" data-cmd="FUSH">Fusion H</button>
-    <button class="cmd-btn" data-cmd="AMSLR">Amsler</button>
+    <button class="cmd-btn" data-cmd="ISH">ISH</button>
+    <button class="cmd-btn" data-cmd="PTX">FIX</button>
+    <button class="cmd-btn" data-cmd="ACP3D">3D</button>
+    <button class="cmd-btn" data-cmd="MOV">MOV</button>
   </div>
 
-  <div class="section-title">Lines</div>
-  <div class="btn-grid cols-2">
-    <button class="cmd-btn" data-cmd="VRTLN">Vertical</button>
-    <button class="cmd-btn" data-cmd="HRZLN">Horizontal</button>
-  </div>
-
-  <div class="section-title">MKH Morphoscopic</div>
-  <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="MKH01">MKH 1</button>
-    <button class="cmd-btn" data-cmd="MKH02">MKH 2</button>
-    <button class="cmd-btn" data-cmd="MKH03">MKH 3</button>
-    <button class="cmd-btn" data-cmd="MKH04">MKH 4</button>
-    <button class="cmd-btn" data-cmd="MKH05">MKH 5</button>
-    <button class="cmd-btn" data-cmd="MKH06">MKH 6</button>
-    <button class="cmd-btn" data-cmd="MKH07">MKH 7</button>
-    <button class="cmd-btn" data-cmd="MKH08">MKH 8</button>
-    <button class="cmd-btn" data-cmd="MKH09">MKH 9</button>
-    <button class="cmd-btn" data-cmd="MKH9B">MKH 9B</button>
-    <button class="cmd-btn" data-cmd="MKH12">MKH 12</button>
-    <button class="cmd-btn" data-cmd="IMG">Eye Edu</button>
+  <div class="btn-grid cols-3" style="margin-top:4px;">
+    <button class="cmd-btn" data-cmd="IMG">EDU</button>
+    <button class="cmd-btn" data-cmd="MEM">MEMO</button>
+    <button class="cmd-btn accent" data-cmd="GETSTATUS">INFO</button>
   </div>
 </div>
 
@@ -547,37 +351,30 @@ body {
 <div class="panel" id="panel-settings">
   <div class="section-title">Connection Mode</div>
   <div class="btn-grid cols-2">
-    <button class="cmd-btn accent" id="btnModeBLE" onclick="setMode('ble')">
-      <span class="icon">&#9889;</span>Bluetooth
-      <span class="sub">Direct BLE</span>
-    </button>
-    <button class="cmd-btn" id="btnModeWS" onclick="setMode('ws')">
-      <span class="icon">&#128246;</span>WiFi
-      <span class="sub">WebSocket</span>
-    </button>
+    <button class="cmd-btn accent" id="btnModeBLE" onclick="setMode('ble')">&#9889; Bluetooth</button>
+    <button class="cmd-btn" id="btnModeWS" onclick="setMode('ws')">&#128246; WiFi</button>
   </div>
 
   <div class="section-title">WiFi Settings</div>
-  <div style="display:flex;gap:8px;align-items:center;">
+  <div style="display:flex;gap:6px;align-items:center;">
     <input type="text" id="wsHost" placeholder="192.168.x.x"
-      style="flex:1;padding:12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);
-      border-radius:var(--radius);color:var(--text);font-size:14px;outline:none;">
-    <span style="color:var(--text2);font-size:13px;">: 8070</span>
+      style="flex:1;padding:10px;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);
+      border-radius:8px;color:var(--text);font-size:13px;outline:none;">
+    <span style="color:var(--text2);font-size:12px;">:8070</span>
   </div>
 
   <div class="section-title">Software Update</div>
-  <button class="cmd-btn" onclick="forceUpdate()" style="width:100%;padding:14px;font-size:15px;font-weight:700;background:var(--accent);border-radius:var(--radius);">
+  <button class="cmd-btn" onclick="forceUpdate()" style="width:100%;padding:12px;font-size:14px;font-weight:700;background:var(--accent);border-radius:8px;">
     &#x1F504; Check for Update
   </button>
-  <div id="updateStatus" style="font-size:12px;color:var(--text2);text-align:center;margin-top:6px;"></div>
+  <div id="updateStatus" style="font-size:11px;color:var(--text2);text-align:center;margin-top:4px;"></div>
 
   <div class="section-title">About</div>
-  <div style="padding:16px;background:var(--surface2);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.06);">
-    <div style="font-weight:700;margin-bottom:8px;">PiEyeChart Remote</div>
-    <div style="font-size:12px;color:var(--text2);line-height:1.6;">
-      96-command remote control<br>
-      Supports BLE &amp; WebSocket<br>
-      Version 1.1
+  <div style="padding:12px;background:var(--surface2);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+    <div style="font-weight:700;font-size:13px;margin-bottom:4px;">PiEyeChart Remote</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.5;">
+      BLE &amp; WiFi remote control<br>
+      Version 1.2
     </div>
   </div>
 </div>
@@ -597,14 +394,14 @@ const PAIRING_CODE = '12345';
 const WS_PORT = 8070;
 
 // === State ===
-let mode = 'ble'; // 'ble' or 'ws'
+let mode = 'ble';
 let bleDevice = null;
 let bleServer = null;
 let bleCmdChar = null;
 let ws = null;
 let connected = false;
 
-// === UI Elements ===
+// === UI ===
 const connDot = document.getElementById('connDot');
 const connLabel = document.getElementById('connLabel');
 const connBtn = document.getElementById('connBtn');
@@ -623,21 +420,20 @@ document.querySelectorAll('.tab').forEach(tab => {
 // === Button clicks ===
 document.querySelectorAll('[data-cmd]').forEach(btn => {
   btn.addEventListener('click', (e) => {
-    const cmd = btn.dataset.cmd;
-    sendCommand(cmd);
+    sendCommand(btn.dataset.cmd);
     ripple(e, btn);
   });
 });
 
-// === Ripple effect ===
+// === Ripple ===
 function ripple(e, el) {
   const r = document.createElement('span');
   r.className = 'ripple';
   const rect = el.getBoundingClientRect();
   const size = Math.max(rect.width, rect.height);
   r.style.width = r.style.height = size + 'px';
-  r.style.left = (e.clientX || e.touches?.[0]?.clientX || rect.left + rect.width/2) - rect.left - size/2 + 'px';
-  r.style.top = (e.clientY || e.touches?.[0]?.clientY || rect.top + rect.height/2) - rect.top - size/2 + 'px';
+  r.style.left = (e.clientX || rect.left + rect.width/2) - rect.left - size/2 + 'px';
+  r.style.top = (e.clientY || rect.top + rect.height/2) - rect.top - size/2 + 'px';
   el.appendChild(r);
   setTimeout(() => r.remove(), 500);
 }
@@ -662,76 +458,47 @@ function setConnStatus(status, label) {
 
 // === Send Command ===
 function sendCommand(cmd) {
-  if (mode === 'ble') {
-    sendBLE(cmd);
-  } else {
-    sendWS(cmd);
-  }
+  mode === 'ble' ? sendBLE(cmd) : sendWS(cmd);
 }
 
-// =============================================
-// BLE CONNECTION
-// =============================================
+// === BLE ===
 async function connectBLE() {
-  if (!navigator.bluetooth) {
-    showToast('Bluetooth not available — use WiFi mode');
-    return;
-  }
-
+  if (!navigator.bluetooth) { showToast('Bluetooth not available'); return; }
   try {
     setConnStatus('connecting', 'Scanning...');
-
     bleDevice = await navigator.bluetooth.requestDevice({
       filters: [{ name: 'PiEyeChart' }],
       optionalServices: [BLE_SERVICE_UUID]
     });
-
     bleDevice.addEventListener('gattserverdisconnected', () => {
       setConnStatus('', 'Disconnected');
       bleCmdChar = null;
       showToast('BLE disconnected');
     });
-
     setConnStatus('connecting', 'Connecting...');
     bleServer = await bleDevice.gatt.connect();
-
     const service = await bleServer.getPrimaryService(BLE_SERVICE_UUID);
-
-    // Authenticate
     setConnStatus('connecting', 'Authenticating...');
     const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
     await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
-
-    // Get command characteristic
     bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
-
     setConnStatus('connected', 'BLE Connected');
     showToast('Connected via Bluetooth');
-
   } catch (err) {
     console.error('[BLE]', err);
     setConnStatus('', 'Disconnected');
-    if (err.name !== 'NotFoundError') {
-      showToast('BLE error: ' + err.message);
-    }
+    if (err.name !== 'NotFoundError') showToast('BLE error: ' + err.message);
   }
 }
 
 function disconnectBLE() {
-  if (bleDevice && bleDevice.gatt.connected) {
-    bleDevice.gatt.disconnect();
-  }
-  bleDevice = null;
-  bleServer = null;
-  bleCmdChar = null;
+  if (bleDevice && bleDevice.gatt.connected) bleDevice.gatt.disconnect();
+  bleDevice = null; bleServer = null; bleCmdChar = null;
   setConnStatus('', 'Disconnected');
 }
 
 async function sendBLE(cmd) {
-  if (!bleCmdChar) {
-    showToast('Not connected');
-    return;
-  }
+  if (!bleCmdChar) { showToast('Not connected'); return; }
   try {
     await bleCmdChar.writeValueWithoutResponse(new TextEncoder().encode(cmd));
   } catch (err) {
@@ -740,113 +507,62 @@ async function sendBLE(cmd) {
   }
 }
 
-// =============================================
-// WEBSOCKET CONNECTION
-// =============================================
+// === WebSocket ===
 function connectWS() {
   const host = document.getElementById('wsHost').value || window.location.hostname || 'localhost';
-  const url = `ws://${host}:${WS_PORT}/`;
-
   try {
     setConnStatus('connecting', 'Connecting...');
-    ws = new WebSocket(url);
-
+    ws = new WebSocket(`ws://${host}:${WS_PORT}/`);
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: 'register', client: 'tablet' }));
       setConnStatus('connected', `WiFi: ${host}`);
       showToast('Connected via WiFi');
     };
-
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-        if (msg.type === 'display_state') {
-          updateExaminerDisplay(msg);
-        }
-      } catch (e) { /* ignore non-JSON */ }
+        if (msg.type === 'display_state') updateExaminerDisplay(msg);
+      } catch(e) {}
     };
-
-    ws.onclose = () => {
-      setConnStatus('', 'Disconnected');
-      ws = null;
-    };
-
-    ws.onerror = () => {
-      setConnStatus('', 'Connection failed');
-      ws = null;
-      showToast('WiFi connection failed');
-    };
-  } catch (err) {
-    setConnStatus('', 'Disconnected');
-    showToast('Connection error');
-  }
+    ws.onclose = () => { setConnStatus('', 'Disconnected'); ws = null; };
+    ws.onerror = () => { setConnStatus('', 'Connection failed'); ws = null; showToast('WiFi connection failed'); };
+  } catch (err) { setConnStatus('', 'Disconnected'); showToast('Connection error'); }
 }
 
-function disconnectWS() {
-  if (ws) {
-    ws.close();
-    ws = null;
-  }
-  setConnStatus('', 'Disconnected');
-}
+function disconnectWS() { if (ws) { ws.close(); ws = null; } setConnStatus('', 'Disconnected'); }
 
 function sendWS(cmd) {
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
-    showToast('Not connected');
-    return;
-  }
+  if (!ws || ws.readyState !== WebSocket.OPEN) { showToast('Not connected'); return; }
   ws.send(JSON.stringify({ cmd, timestamp: Date.now() }));
 }
 
-// =============================================
-// MODE & CONNECTION TOGGLE
-// =============================================
+// === Mode ===
 function setMode(m) {
   mode = m;
   document.getElementById('btnModeBLE').className = 'cmd-btn' + (m === 'ble' ? ' accent' : '');
   document.getElementById('btnModeWS').className = 'cmd-btn' + (m === 'ws' ? ' accent' : '');
-  // Disconnect current
-  disconnectBLE();
-  disconnectWS();
+  disconnectBLE(); disconnectWS();
   showToast(m === 'ble' ? 'Bluetooth mode' : 'WiFi mode');
 }
 
 function toggleConnection() {
-  if (connected) {
-    mode === 'ble' ? disconnectBLE() : disconnectWS();
-  } else {
-    mode === 'ble' ? connectBLE() : connectWS();
-  }
+  connected ? (mode === 'ble' ? disconnectBLE() : disconnectWS()) : (mode === 'ble' ? connectBLE() : connectWS());
 }
 
-// =============================================
-// EXAMINER DISPLAY
-// =============================================
+// === Examiner Display ===
 function updateExaminerDisplay(state) {
-  // state: { type:'display_state', test, acuity, letters, mode, row }
-  const testName = document.getElementById('examTestName');
-  const acuity = document.getElementById('examAcuity');
-  const letters = document.getElementById('examLetters');
-  const modeEl = document.getElementById('examMode');
-  const rowEl = document.getElementById('examRow');
-
-  if (state.test) testName.textContent = state.test.replace(/_/g, ' ').toUpperCase();
-  if (state.acuity) acuity.textContent = state.acuity;
+  if (state.test) document.getElementById('examTestName').textContent = state.test.replace(/_/g, ' ').toUpperCase();
+  if (state.acuity) document.getElementById('examAcuity').textContent = state.acuity;
   if (state.letters) {
-    // Display letters with spacing
-    letters.innerHTML = '';
+    const el = document.getElementById('examLetters');
+    el.innerHTML = '';
     const span = document.createElement('span');
-    span.className = 'letter';
     span.textContent = state.letters;
-    letters.appendChild(span);
+    el.appendChild(span);
   }
-  if (state.mode) modeEl.textContent = state.mode;
-  if (state.row !== undefined) rowEl.textContent = 'Row ' + (state.row + 1);
+  if (state.mode) document.getElementById('examMode').textContent = state.mode;
+  if (state.row !== undefined) document.getElementById('examRow').textContent = 'Row ' + (state.row + 1);
 }
-
-// === Init ===
-setMode('ble');
-console.log('[Remote] PiEyeChart Remote loaded — 96 commands');
 
 // === Force Update ===
 function forceUpdate() {
@@ -854,35 +570,28 @@ function forceUpdate() {
   status.textContent = 'Checking...';
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistration().then(reg => {
-      if (reg) {
-        reg.unregister().then(() => {
-          caches.keys().then(keys => {
-            Promise.all(keys.map(k => caches.delete(k))).then(() => {
-              status.textContent = 'Updated! Reloading...';
-              setTimeout(() => location.reload(true), 500);
-            });
-          });
-        });
-      } else {
+      const clearAndReload = () => {
         caches.keys().then(keys => {
           Promise.all(keys.map(k => caches.delete(k))).then(() => {
             status.textContent = 'Updated! Reloading...';
             setTimeout(() => location.reload(true), 500);
           });
         });
-      }
+      };
+      if (reg) reg.unregister().then(clearAndReload);
+      else clearAndReload();
     });
   } else {
-    status.textContent = 'Updated! Reloading...';
     setTimeout(() => location.reload(true), 500);
   }
 }
 
-// === Service Worker (offline support) ===
+// === Init ===
+setMode('ble');
+
+// === Service Worker ===
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(() => {
-    console.log('[SW] Registered');
-  }).catch(err => console.warn('[SW]', err));
+  navigator.serviceWorker.register('./sw.js').then(() => {}).catch(e => console.warn('[SW]', e));
 }
 </script>
 
