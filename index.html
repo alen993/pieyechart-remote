@@ -249,6 +249,7 @@ body {
 <div class="tabs">
   <button class="tab active" data-panel="main">Main</button>
   <button class="tab" data-panel="tests">Tests</button>
+  <button class="tab" data-panel="acuity">Acuity</button>
   <button class="tab" data-panel="settings">Settings</button>
 </div>
 
@@ -280,7 +281,27 @@ body {
     <button class="cmd-btn" data-cmd="NRL">Normal</button>
   </div>
 
-  <div class="section-title">Acuity</div>
+  <div class="section-title">Optotype</div>
+  <div class="btn-grid cols-5">
+    <button class="cmd-btn" data-cmd="OAL">Letters</button>
+    <button class="cmd-btn" data-cmd="OCH">Numbers</button>
+    <button class="cmd-btn" data-cmd="OSN">E</button>
+    <button class="cmd-btn" data-cmd="OLN">C</button>
+    <button class="cmd-btn" data-cmd="OIM">Child</button>
+  </div>
+
+  <div class="section-title">Layout</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="MSN">Single</button>
+    <button class="cmd-btn" data-cmd="MLN">Row</button>
+    <button class="cmd-btn" data-cmd="M3L">3 Rows</button>
+    <button class="cmd-btn" data-cmd="MCP">Column</button>
+  </div>
+</div>
+
+<!-- ============ ACUITY PANEL ============ -->
+<div class="panel" id="panel-acuity">
+  <div class="section-title">Direct Acuity Jump</div>
   <div class="acuity-grid">
     <button class="acuity-btn" data-cmd="A005">0.05</button>
     <button class="acuity-btn" data-cmd="A010">0.1</button>
@@ -295,27 +316,10 @@ body {
     <button class="acuity-btn" data-cmd="A120">1.2</button>
     <button class="acuity-btn" data-cmd="A200">2.0</button>
   </div>
-
-  <div class="section-title">Layout</div>
-  <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="MSN">Single</button>
-    <button class="cmd-btn" data-cmd="MLN">Row</button>
-    <button class="cmd-btn" data-cmd="M3L">3 Rows</button>
-    <button class="cmd-btn" data-cmd="MCP">Column</button>
-  </div>
 </div>
 
 <!-- ============ TESTS PANEL ============ -->
 <div class="panel" id="panel-tests">
-  <div class="section-title">Optotype</div>
-  <div class="btn-grid cols-5">
-    <button class="cmd-btn" data-cmd="OAL">Letters</button>
-    <button class="cmd-btn" data-cmd="OCH">Numbers</button>
-    <button class="cmd-btn" data-cmd="OSN">E</button>
-    <button class="cmd-btn" data-cmd="OLN">C</button>
-    <button class="cmd-btn" data-cmd="OIM">Child</button>
-  </div>
-
   <div class="section-title">Groups</div>
   <div class="btn-grid cols-4">
     <button class="cmd-btn" data-cmd="G1">G1</button>
