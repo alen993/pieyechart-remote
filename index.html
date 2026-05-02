@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PiEyeChart Remote</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#6366f1">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #14141f;
+  --surface2: #1e1e2e;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #22c55e;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --radius: 14px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* === Connection Bar === */
+.conn-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+}
+.conn-bar .logo {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.conn-bar .logo span { color: var(--accent); }
+.conn-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.conn-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  transition: background 0.3s;
+}
+.conn-dot.connected { background: var(--green); }
+.conn-dot.connecting { background: var(--amber); animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+.conn-btn {
+  background: var(--accent);
+  border: none;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.conn-btn:active { transform: scale(0.95); }
+.conn-btn.disconnect { background: var(--red); }
+
+/* === Tab Navigation === */
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1;
+  min-width: fit-content;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-align: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* === Panels === */
+.panel { display: none; padding: 16px; padding-bottom: calc(16px + var(--safe-b)); }
+.panel.active { display: block; }
+
+/* === Button Grid === */
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 16px 0 10px;
+}
+.section-title:first-child { margin-top: 4px; }
+
+.btn-grid {
+  display: grid;
+  gap: 8px;
+}
+.btn-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.btn-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.btn-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.btn-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+.cmd-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 8px;
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 54px;
+  position: relative;
+  overflow: hidden;
+}
+.cmd-btn:active {
+  transform: scale(0.94);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.cmd-btn .icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.cmd-btn .sub {
+  font-size: 9px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.cmd-btn:active .sub { color: rgba(255,255,255,0.7); }
+
+/* Special button colors */
+.cmd-btn.yes { border-color: rgba(34,197,94,0.3); color: var(--green); }
+.cmd-btn.yes:active { background: var(--green); color: white; }
+.cmd-btn.no { border-color: rgba(239,68,68,0.3); color: var(--red); }
+.cmd-btn.no:active { background: var(--red); color: white; }
+.cmd-btn.accent { border-color: rgba(99,102,241,0.3); color: var(--accent2); }
+.cmd-btn.accent:active { background: var(--accent); color: white; }
+
+/* === D-Pad === */
+.dpad-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+.dpad {
+  display: grid;
+  grid-template-columns: 70px 70px 70px;
+  grid-template-rows: 70px 70px 70px;
+  gap: 6px;
+}
+.dpad .cmd-btn { border-radius: 16px; min-height: unset; }
+.dpad .center {
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 800;
+  font-size: 14px;
+}
+.dpad .center:active { background: #4f46e5; }
+.dpad .empty { background: transparent; border: none; pointer-events: none; }
+
+/* === Acuity Buttons === */
+.acuity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.acuity-btn {
+  padding: 12px 4px;
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.acuity-btn:active {
+  transform: scale(0.94);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* === Examiner Display === */
+.exam-display {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.exam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(99,102,241,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.exam-test-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.exam-acuity {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--green);
+}
+.exam-letters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 12px 16px;
+  gap: 12px;
+}
+.exam-letters .letter {
+  font-family: 'Optician Sans', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 8px;
+}
+.exam-letters .no-data {
+  font-size: 13px;
+  color: var(--text2);
+  font-style: italic;
+}
+.exam-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px;
+  font-size: 10px;
+  color: var(--text2);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* === Toast === */
+.toast {
+  position: fixed;
+  bottom: calc(80px + var(--safe-b));
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 200;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* === Ripple effect === */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transform: scale(0);
+  animation: ripple-anim 0.5s ease-out;
+  pointer-events: none;
+}
+@keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
+
+/* === Landscape optimization === */
+@media (orientation: landscape) {
+  .panel { padding: 8px 16px; }
+  .dpad-container { padding: 10px 0; }
+  .dpad { grid-template-columns: 56px 56px 56px; grid-template-rows: 56px 56px 56px; }
+  .cmd-btn { padding: 10px 6px; min-height: 46px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Connection Bar -->
+<div class="conn-bar">
+  <div class="logo">Pi<span>Eye</span>Chart</div>
+  <div class="conn-status">
+    <div class="conn-dot" id="connDot"></div>
+    <span id="connLabel">Disconnected</span>
+  </div>
+  <button class="conn-btn" id="connBtn" onclick="toggleConnection()">Connect</button>
+</div>
+
+<!-- Examiner Display -->
+<div class="exam-display" id="examDisplay">
+  <div class="exam-header">
+    <span class="exam-test-name" id="examTestName">---</span>
+    <span class="exam-acuity" id="examAcuity">---</span>
+  </div>
+  <div class="exam-letters">
+    <span class="letter" id="examLetters"><span class="no-data">Waiting for display...</span></span>
+  </div>
+  <div class="exam-footer">
+    <span id="examMode">---</span>
+    <span id="examRow">---</span>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" data-panel="nav">Navigate</button>
+  <button class="tab" data-panel="tests">Tests</button>
+  <button class="tab" data-panel="acuity">Acuity</button>
+  <button class="tab" data-panel="special">Special</button>
+  <button class="tab" data-panel="settings">Settings</button>
+</div>
+
+<!-- ============ NAVIGATE PANEL ============ -->
+<div class="panel active" id="panel-nav">
+  <div class="section-title">Confirm / Cancel</div>
+  <div class="btn-grid cols-2">
+    <button class="cmd-btn yes" data-cmd="OUI"><span class="icon">&#10003;</span>YES</button>
+    <button class="cmd-btn no" data-cmd="NON"><span class="icon">&#10007;</span>NO</button>
+  </div>
+
+  <div class="section-title">Navigation</div>
+  <div class="dpad-container">
+    <div class="dpad">
+      <div class="empty"></div>
+      <button class="cmd-btn" data-cmd="UP"><span class="icon">&#9650;</span></button>
+      <div class="empty"></div>
+      <button class="cmd-btn" data-cmd="LEFT"><span class="icon">&#9664;</span></button>
+      <button class="cmd-btn center" data-cmd="CHG">CHG</button>
+      <button class="cmd-btn" data-cmd="RIGHT"><span class="icon">&#9654;</span></button>
+      <div class="empty"></div>
+      <button class="cmd-btn" data-cmd="DOWN"><span class="icon">&#9660;</span></button>
+      <div class="empty"></div>
+    </div>
+  </div>
+
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="UPFAST"><span class="icon">&#9195;</span>Fast Up</button>
+    <button class="cmd-btn" data-cmd="DOWNFAST"><span class="icon">&#9196;</span>Fast Down</button>
+    <button class="cmd-btn accent" data-cmd="GETSTATUS"><span class="icon">&#8505;</span>Info</button>
+  </div>
+
+  <div class="section-title">Display</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="RV"><span class="icon">&#127752;</span>R/G</button>
+    <button class="cmd-btn" data-cmd="INV"><span class="icon">&#9680;</span>B/W</button>
+    <button class="cmd-btn" data-cmd="NRL"><span class="icon">&#9681;</span>Normal</button>
+  </div>
+
+  <div class="section-title">Layout</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="MSN">Single</button>
+    <button class="cmd-btn" data-cmd="MLN">1 Row</button>
+    <button class="cmd-btn" data-cmd="M3L">3 Rows</button>
+  </div>
+  <div class="btn-grid cols-3" style="margin-top:8px">
+    <button class="cmd-btn" data-cmd="MCP">Column</button>
+    <button class="cmd-btn" data-cmd="M3P">3 Panel</button>
+    <button class="cmd-btn" data-cmd="MCS">Col Split</button>
+  </div>
+</div>
+
+<!-- ============ TESTS PANEL ============ -->
+<div class="panel" id="panel-tests">
+  <div class="section-title">Acuity Charts</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="OAL"><span class="icon">A</span>Letters</button>
+    <button class="cmd-btn" data-cmd="OCH"><span class="icon">1</span>Numbers</button>
+    <button class="cmd-btn" data-cmd="OSN"><span class="icon">E</span>Tumbling E</button>
+    <button class="cmd-btn" data-cmd="OLN"><span class="icon">C</span>Landolt C</button>
+    <button class="cmd-btn" data-cmd="OIM"><span class="icon">&#9786;</span>Children</button>
+    <button class="cmd-btn" data-cmd="OFM"><span class="icon">&#9632;</span>Geometric</button>
+  </div>
+
+  <div class="section-title">ETDRS</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="EDRSG">ETDRS G</button>
+    <button class="cmd-btn" data-cmd="EDRSD">ETDRS D</button>
+    <button class="cmd-btn" data-cmd="EDRSR">ETDRS R</button>
+  </div>
+
+  <div class="section-title">Binocular / Phoria</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="WOR"><span class="icon">&#9673;</span>Worth 4</button>
+    <button class="cmd-btn" data-cmd="STR"><span class="icon">&#9670;</span>Stereo</button>
+    <button class="cmd-btn" data-cmd="SCH"><span class="icon">&#10023;</span>Schober</button>
+    <button class="cmd-btn" data-cmd="MPT">Phoria</button>
+    <button class="cmd-btn" data-cmd="JAC">Jackson</button>
+    <button class="cmd-btn" data-cmd="OXO">OXO</button>
+  </div>
+
+  <div class="section-title">Balance</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="BRV">R/G Bal</button>
+    <button class="cmd-btn" data-cmd="BPOL">Pol Bal</button>
+    <button class="cmd-btn" data-cmd="BALANCEBIN">Bino Bal</button>
+    <button class="cmd-btn" data-cmd="BDP1">Duo P1</button>
+    <button class="cmd-btn" data-cmd="BDP2">Duo P2</button>
+  </div>
+
+  <div class="section-title">Clock / Astigmatism</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="CPT">Clock</button>
+    <button class="cmd-btn" data-cmd="AST01">Astig 1</button>
+    <button class="cmd-btn" data-cmd="AST02">Astig 2</button>
+    <button class="cmd-btn" data-cmd="ANC">Aniseic</button>
+  </div>
+</div>
+
+<!-- ============ ACUITY PANEL ============ -->
+<div class="panel" id="panel-acuity">
+  <div class="section-title">Direct Acuity Jump</div>
+  <div class="acuity-grid">
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.05">0.05<br><small>6/120</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.1">0.1<br><small>6/60</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.2">0.2<br><small>6/30</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.25">0.25<br><small>6/24</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.3">0.3<br><small>6/20</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.4">0.4<br><small>6/15</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.5">0.5<br><small>6/12</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.7">0.7<br><small>6/8.5</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="0.8">0.8<br><small>6/7.5</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="1.0">1.0<br><small>6/6</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="1.2">1.2<br><small>6/5</small></button>
+    <button class="acuity-btn" data-cmd="UP" data-acuity="1.5">1.5<br><small>6/4</small></button>
+  </div>
+
+  <div class="section-title">Quick Navigate</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="UPFAST"><span class="icon">&#9650;&#9650;</span>Up Fast</button>
+    <button class="cmd-btn" data-cmd="UP"><span class="icon">&#9650;</span>Up</button>
+    <button class="cmd-btn" data-cmd="DOWN"><span class="icon">&#9660;</span>Down</button>
+    <button class="cmd-btn" data-cmd="DOWNFAST"><span class="icon">&#9660;&#9660;</span>Down Fast</button>
+  </div>
+
+  <div class="section-title">Contrast</div>
+  <div class="btn-grid cols-2">
+    <button class="cmd-btn" data-cmd="LEFT"><span class="icon">&#9664;</span>Less Contrast</button>
+    <button class="cmd-btn" data-cmd="RIGHT"><span class="icon">&#9654;</span>More Contrast</button>
+  </div>
+</div>
+
+<!-- ============ SPECIAL PANEL ============ -->
+<div class="panel" id="panel-special">
+  <div class="section-title">Vision Tests</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="ISH"><span class="icon">&#127912;</span>Color Vision</button>
+    <button class="cmd-btn" data-cmd="PEL"><span class="icon">&#9635;</span>Contrast Sens</button>
+    <button class="cmd-btn" data-cmd="VEI"><span class="icon">&#9788;</span>Veil / Glare</button>
+    <button class="cmd-btn" data-cmd="SHN">Sheridan</button>
+    <button class="cmd-btn" data-cmd="PIC"><span class="icon">&#9881;</span>Pictures</button>
+    <button class="cmd-btn" data-cmd="MOV"><span class="icon">&#9654;</span>Video</button>
+  </div>
+
+  <div class="section-title">Polarized / 3D</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="ACP">Acuity Pol</button>
+    <button class="cmd-btn" data-cmd="ACP3D">Acuity 3D</button>
+    <button class="cmd-btn" data-cmd="PSKL3D">Image 3D</button>
+  </div>
+
+  <div class="section-title">Dazzle / Glare</div>
+  <div class="btn-grid cols-3">
+    <button class="cmd-btn" data-cmd="DZLHAL">Halo</button>
+    <button class="cmd-btn" data-cmd="DZLREC">Recovery</button>
+    <button class="cmd-btn" data-cmd="DZLDRV">Driver</button>
+  </div>
+
+  <div class="section-title">Fixation / Fusion</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="PTX">Fixation</button>
+    <button class="cmd-btn" data-cmd="FUSV">Fusion V</button>
+    <button class="cmd-btn" data-cmd="FUSH">Fusion H</button>
+    <button class="cmd-btn" data-cmd="AMSLR">Amsler</button>
+  </div>
+
+  <div class="section-title">Lines</div>
+  <div class="btn-grid cols-2">
+    <button class="cmd-btn" data-cmd="VRTLN">Vertical</button>
+    <button class="cmd-btn" data-cmd="HRZLN">Horizontal</button>
+  </div>
+
+  <div class="section-title">MKH Morphoscopic</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="MKH01">MKH 1</button>
+    <button class="cmd-btn" data-cmd="MKH02">MKH 2</button>
+    <button class="cmd-btn" data-cmd="MKH03">MKH 3</button>
+    <button class="cmd-btn" data-cmd="MKH04">MKH 4</button>
+    <button class="cmd-btn" data-cmd="MKH05">MKH 5</button>
+    <button class="cmd-btn" data-cmd="MKH06">MKH 6</button>
+    <button class="cmd-btn" data-cmd="MKH07">MKH 7</button>
+    <button class="cmd-btn" data-cmd="MKH08">MKH 8</button>
+    <button class="cmd-btn" data-cmd="MKH09">MKH 9</button>
+    <button class="cmd-btn" data-cmd="MKH9B">MKH 9B</button>
+    <button class="cmd-btn" data-cmd="MKH12">MKH 12</button>
+    <button class="cmd-btn" data-cmd="IMG">Eye Edu</button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS PANEL ============ -->
+<div class="panel" id="panel-settings">
+  <div class="section-title">Connection Mode</div>
+  <div class="btn-grid cols-2">
+    <button class="cmd-btn accent" id="btnModeBLE" onclick="setMode('ble')">
+      <span class="icon">&#9889;</span>Bluetooth
+      <span class="sub">Direct BLE</span>
+    </button>
+    <button class="cmd-btn" id="btnModeWS" onclick="setMode('ws')">
+      <span class="icon">&#128246;</span>WiFi
+      <span class="sub">WebSocket</span>
+    </button>
+  </div>
+
+  <div class="section-title">WiFi Settings</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <input type="text" id="wsHost" placeholder="192.168.x.x"
+      style="flex:1;padding:12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--radius);color:var(--text);font-size:14px;outline:none;">
+    <span style="color:var(--text2);font-size:13px;">: 8070</span>
+  </div>
+
+  <div class="section-title">About</div>
+  <div style="padding:16px;background:var(--surface2);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.06);">
+    <div style="font-weight:700;margin-bottom:8px;">PiEyeChart Remote</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6;">
+      96-command remote control<br>
+      Supports BLE &amp; WebSocket<br>
+      Version 1.0
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// === Config ===
+const BLE_SERVICE_UUID    = 'pie10001-0001-1000-8000-00805f9b34fb';
+const BLE_CMD_CHAR_UUID   = 'pie10001-0002-1000-8000-00805f9b34fb';
+const BLE_STATUS_CHAR_UUID= 'pie10001-0003-1000-8000-00805f9b34fb';
+const BLE_AUTH_CHAR_UUID  = 'pie10001-0004-1000-8000-00805f9b34fb';
+const PAIRING_CODE = '12345';
+const WS_PORT = 8070;
+
+// === State ===
+let mode = 'ble'; // 'ble' or 'ws'
+let bleDevice = null;
+let bleServer = null;
+let bleCmdChar = null;
+let ws = null;
+let connected = false;
+
+// === UI Elements ===
+const connDot = document.getElementById('connDot');
+const connLabel = document.getElementById('connLabel');
+const connBtn = document.getElementById('connBtn');
+const toastEl = document.getElementById('toast');
+
+// === Tab switching ===
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+  });
+});
+
+// === Button clicks ===
+document.querySelectorAll('[data-cmd]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const cmd = btn.dataset.cmd;
+    sendCommand(cmd);
+    ripple(e, btn);
+  });
+});
+
+// === Ripple effect ===
+function ripple(e, el) {
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.width = r.style.height = size + 'px';
+  r.style.left = (e.clientX || e.touches?.[0]?.clientX || rect.left + rect.width/2) - rect.left - size/2 + 'px';
+  r.style.top = (e.clientY || e.touches?.[0]?.clientY || rect.top + rect.height/2) - rect.top - size/2 + 'px';
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+// === Toast ===
+let toastTimer;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2000);
+}
+
+// === Connection Status ===
+function setConnStatus(status, label) {
+  connDot.className = 'conn-dot ' + status;
+  connLabel.textContent = label;
+  connected = status === 'connected';
+  connBtn.textContent = connected ? 'Disconnect' : 'Connect';
+  connBtn.className = 'conn-btn' + (connected ? ' disconnect' : '');
+}
+
+// === Send Command ===
+function sendCommand(cmd) {
+  if (mode === 'ble') {
+    sendBLE(cmd);
+  } else {
+    sendWS(cmd);
+  }
+}
+
+// =============================================
+// BLE CONNECTION
+// =============================================
+async function connectBLE() {
+  if (!navigator.bluetooth) {
+    showToast('Bluetooth not available — use WiFi mode');
+    return;
+  }
+
+  try {
+    setConnStatus('connecting', 'Scanning...');
+
+    bleDevice = await navigator.bluetooth.requestDevice({
+      filters: [{ name: 'PiEyeChart' }],
+      optionalServices: [BLE_SERVICE_UUID]
+    });
+
+    bleDevice.addEventListener('gattserverdisconnected', () => {
+      setConnStatus('', 'Disconnected');
+      bleCmdChar = null;
+      showToast('BLE disconnected');
+    });
+
+    setConnStatus('connecting', 'Connecting...');
+    bleServer = await bleDevice.gatt.connect();
+
+    const service = await bleServer.getPrimaryService(BLE_SERVICE_UUID);
+
+    // Authenticate
+    setConnStatus('connecting', 'Authenticating...');
+    const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
+    await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
+
+    // Get command characteristic
+    bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
+
+    setConnStatus('connected', 'BLE Connected');
+    showToast('Connected via Bluetooth');
+
+  } catch (err) {
+    console.error('[BLE]', err);
+    setConnStatus('', 'Disconnected');
+    if (err.name !== 'NotFoundError') {
+      showToast('BLE error: ' + err.message);
+    }
+  }
+}
+
+function disconnectBLE() {
+  if (bleDevice && bleDevice.gatt.connected) {
+    bleDevice.gatt.disconnect();
+  }
+  bleDevice = null;
+  bleServer = null;
+  bleCmdChar = null;
+  setConnStatus('', 'Disconnected');
+}
+
+async function sendBLE(cmd) {
+  if (!bleCmdChar) {
+    showToast('Not connected');
+    return;
+  }
+  try {
+    await bleCmdChar.writeValueWithoutResponse(new TextEncoder().encode(cmd));
+  } catch (err) {
+    console.error('[BLE] Send error:', err);
+    showToast('Send failed');
+  }
+}
+
+// =============================================
+// WEBSOCKET CONNECTION
+// =============================================
+function connectWS() {
+  const host = document.getElementById('wsHost').value || window.location.hostname || 'localhost';
+  const url = `ws://${host}:${WS_PORT}/`;
+
+  try {
+    setConnStatus('connecting', 'Connecting...');
+    ws = new WebSocket(url);
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: 'register', client: 'tablet' }));
+      setConnStatus('connected', `WiFi: ${host}`);
+      showToast('Connected via WiFi');
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'display_state') {
+          updateExaminerDisplay(msg);
+        }
+      } catch (e) { /* ignore non-JSON */ }
+    };
+
+    ws.onclose = () => {
+      setConnStatus('', 'Disconnected');
+      ws = null;
+    };
+
+    ws.onerror = () => {
+      setConnStatus('', 'Connection failed');
+      ws = null;
+      showToast('WiFi connection failed');
+    };
+  } catch (err) {
+    setConnStatus('', 'Disconnected');
+    showToast('Connection error');
+  }
+}
+
+function disconnectWS() {
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
+  setConnStatus('', 'Disconnected');
+}
+
+function sendWS(cmd) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    showToast('Not connected');
+    return;
+  }
+  ws.send(JSON.stringify({ cmd, timestamp: Date.now() }));
+}
+
+// =============================================
+// MODE & CONNECTION TOGGLE
+// =============================================
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnModeBLE').className = 'cmd-btn' + (m === 'ble' ? ' accent' : '');
+  document.getElementById('btnModeWS').className = 'cmd-btn' + (m === 'ws' ? ' accent' : '');
+  // Disconnect current
+  disconnectBLE();
+  disconnectWS();
+  showToast(m === 'ble' ? 'Bluetooth mode' : 'WiFi mode');
+}
+
+function toggleConnection() {
+  if (connected) {
+    mode === 'ble' ? disconnectBLE() : disconnectWS();
+  } else {
+    mode === 'ble' ? connectBLE() : connectWS();
+  }
+}
+
+// =============================================
+// EXAMINER DISPLAY
+// =============================================
+function updateExaminerDisplay(state) {
+  // state: { type:'display_state', test, acuity, letters, mode, row }
+  const testName = document.getElementById('examTestName');
+  const acuity = document.getElementById('examAcuity');
+  const letters = document.getElementById('examLetters');
+  const modeEl = document.getElementById('examMode');
+  const rowEl = document.getElementById('examRow');
+
+  if (state.test) testName.textContent = state.test.replace(/_/g, ' ').toUpperCase();
+  if (state.acuity) acuity.textContent = state.acuity;
+  if (state.letters) {
+    // Display letters with spacing
+    letters.innerHTML = '';
+    const span = document.createElement('span');
+    span.className = 'letter';
+    span.textContent = state.letters;
+    letters.appendChild(span);
+  }
+  if (state.mode) modeEl.textContent = state.mode;
+  if (state.row !== undefined) rowEl.textContent = 'Row ' + (state.row + 1);
+}
+
+// === Init ===
+setMode('ble');
+console.log('[Remote] PiEyeChart Remote loaded — 96 commands');
+
+// === Service Worker (offline support) ===
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(() => {
+    console.log('[SW] Registered');
+  }).catch(err => console.warn('[SW]', err));
+}
+</script>
+
+</body>
+</html>

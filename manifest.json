@@ -1,0 +1,14 @@
+{
+  "name": "PiEyeChart Remote",
+  "short_name": "PiEyeChart",
+  "description": "Bluetooth remote control for PiEyeChart acuity display",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0f",
+  "theme_color": "#6366f1",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
