@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pieyechart-remote-v1';
+const CACHE_NAME = 'pieyechart-remote-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -25,9 +25,13 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Fetch — cache first, then network
+// Fetch — network first, fall back to cache (ensures updates are picked up)
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request).then(response => {
+      const clone = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+      return response;
+    }).catch(() => caches.match(e.request))
   );
 });

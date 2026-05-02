@@ -571,13 +571,19 @@ body {
     <span style="color:var(--text2);font-size:13px;">: 8070</span>
   </div>
 
+  <div class="section-title">Software Update</div>
+  <button class="cmd-btn" onclick="forceUpdate()" style="width:100%;padding:14px;font-size:15px;font-weight:700;background:var(--accent);border-radius:var(--radius);">
+    &#x1F504; Check for Update
+  </button>
+  <div id="updateStatus" style="font-size:12px;color:var(--text2);text-align:center;margin-top:6px;"></div>
+
   <div class="section-title">About</div>
   <div style="padding:16px;background:var(--surface2);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.06);">
     <div style="font-weight:700;margin-bottom:8px;">PiEyeChart Remote</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6;">
       96-command remote control<br>
       Supports BLE &amp; WebSocket<br>
-      Version 1.0
+      Version 1.1
     </div>
   </div>
 </div>
@@ -847,6 +853,36 @@ function updateExaminerDisplay(state) {
 // === Init ===
 setMode('ble');
 console.log('[Remote] PiEyeChart Remote loaded — 96 commands');
+
+// === Force Update ===
+function forceUpdate() {
+  const status = document.getElementById('updateStatus');
+  status.textContent = 'Checking...';
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if (reg) {
+        reg.unregister().then(() => {
+          caches.keys().then(keys => {
+            Promise.all(keys.map(k => caches.delete(k))).then(() => {
+              status.textContent = 'Updated! Reloading...';
+              setTimeout(() => location.reload(true), 500);
+            });
+          });
+        });
+      } else {
+        caches.keys().then(keys => {
+          Promise.all(keys.map(k => caches.delete(k))).then(() => {
+            status.textContent = 'Updated! Reloading...';
+            setTimeout(() => location.reload(true), 500);
+          });
+        });
+      }
+    });
+  } else {
+    status.textContent = 'Updated! Reloading...';
+    setTimeout(() => location.reload(true), 500);
+  }
+}
 
 // === Service Worker (offline support) ===
 if ('serviceWorker' in navigator) {
