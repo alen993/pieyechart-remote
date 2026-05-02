@@ -346,7 +346,7 @@ body {
   <div class="btn-grid cols-3" style="margin-top:4px;">
     <button class="cmd-btn" data-cmd="IMG">EDU</button>
     <button class="cmd-btn" data-cmd="MEM">MEMO</button>
-    <button class="cmd-btn accent" data-cmd="INFO">INFO</button>
+    <button class="cmd-btn accent" id="btnInfo" data-cmd="INFO">INFO</button>
   </div>
 </div>
 
@@ -591,6 +591,23 @@ function forceUpdate() {
 
 // === Init ===
 setMode('ble');
+
+// === INFO long-press: hold to keep zoomed, release → 3s timer ===
+const btnInfo = document.getElementById('btnInfo');
+let infoHoldInterval = null;
+btnInfo.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  sendCommand('INFO');
+  infoHoldInterval = setInterval(() => sendCommand('INFO'), 500);
+}, { passive: false });
+btnInfo.addEventListener('touchend', () => {
+  clearInterval(infoHoldInterval);
+  infoHoldInterval = null;
+});
+btnInfo.addEventListener('touchcancel', () => {
+  clearInterval(infoHoldInterval);
+  infoHoldInterval = null;
+});
 
 // === Service Worker ===
 if ('serviceWorker' in navigator) {
