@@ -116,23 +116,23 @@ body {
 }
 
 /* === Panels === */
-.panel { display: none; padding: 16px; padding-bottom: calc(16px + var(--safe-b)); }
+.panel { display: none; padding: 8px 10px; padding-bottom: calc(8px + var(--safe-b)); }
 .panel.active { display: block; }
 
 /* === Button Grid === */
 .section-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--text2);
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  margin: 16px 0 10px;
+  margin: 8px 0 4px;
 }
-.section-title:first-child { margin-top: 4px; }
+.section-title:first-child { margin-top: 2px; }
 
 .btn-grid {
   display: grid;
-  gap: 8px;
+  gap: 5px;
 }
 .btn-grid.cols-2 { grid-template-columns: 1fr 1fr; }
 .btn-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -144,16 +144,16 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px 8px;
+  padding: 8px 4px;
   background: var(--surface2);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius);
+  border-radius: 10px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  min-height: 54px;
+  min-height: 40px;
   position: relative;
   overflow: hidden;
 }
@@ -163,8 +163,8 @@ body {
   border-color: var(--accent);
 }
 .cmd-btn .icon {
-  font-size: 20px;
-  margin-bottom: 4px;
+  font-size: 16px;
+  margin-bottom: 2px;
 }
 .cmd-btn .sub {
   font-size: 9px;
@@ -185,13 +185,13 @@ body {
 .dpad-container {
   display: flex;
   justify-content: center;
-  padding: 20px 0;
+  padding: 8px 0;
 }
 .dpad {
   display: grid;
-  grid-template-columns: 70px 70px 70px;
-  grid-template-rows: 70px 70px 70px;
-  gap: 6px;
+  grid-template-columns: 56px 56px 56px;
+  grid-template-rows: 56px 56px 56px;
+  gap: 5px;
 }
 .dpad .cmd-btn { border-radius: 16px; min-height: unset; }
 .dpad .center {
@@ -259,16 +259,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 64px;
-  padding: 12px 16px;
-  gap: 12px;
+  min-height: 44px;
+  padding: 6px 12px;
+  gap: 8px;
 }
 .exam-letters .letter {
   font-family: 'Optician Sans', sans-serif;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: 8px;
+  letter-spacing: 6px;
 }
 .exam-letters .no-data {
   font-size: 13px;
