@@ -560,6 +560,20 @@ body {
     <span style="color:var(--text3);font-size:12px;font-weight:600;">:8070</span>
   </div>
 
+  <div class="section-title">Type to chart (passwords, names)</div>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <input type="text" id="typeInput" placeholder="Type here, then Send"
+      style="flex:1;padding:10px 12px;background:var(--surface2);border:1px solid rgba(99,102,241,0.15);
+      border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;
+      transition:border-color 0.2s;" autocomplete="off"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(99,102,241,0.15)'">
+    <button class="cmd-btn accent" onclick="sendTypeText()"
+      style="padding:10px 14px;font-size:13px;font-weight:700">Send</button>
+  </div>
+  <div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4">
+    Tip: open the chart's WiFi password screen first, then type here on your phone keyboard and tap Send.
+  </div>
+
   <div class="section-title">Software Update</div>
   <button class="cmd-btn" onclick="forceUpdate()" style="width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg, var(--accent), #7c3aed);border:none;border-radius:var(--radius-sm);box-shadow:0 4px 12px var(--accent-glow);">
     &#x1F504; Check for Update
@@ -819,6 +833,21 @@ function renderMiniChart() {
 function sendCommand(cmd) {
   applyLocalCmd(cmd);                                 // update mini-chart immediately
   mode === 'ble' ? sendBLE(cmd) : sendWS(cmd);        // dispatch to chart
+}
+
+// === Send free text (typed on phone keyboard) to chart's active OSK ===
+function sendTypeText() {
+  const input = document.getElementById('typeInput');
+  if (!input || !input.value) return;
+  const text = input.value;
+  if (mode === 'ws') {
+    if (!ws || ws.readyState !== WebSocket.OPEN) { showToast('WiFi not connected'); return; }
+    ws.send(JSON.stringify({ type: 'osk_text', text }));
+    showToast('Sent: ' + (text.length > 12 ? text.slice(0,12) + '…' : text));
+    input.value = '';
+  } else {
+    showToast('Switch to WiFi mode to type');
+  }
 }
 
 // === BLE ===
