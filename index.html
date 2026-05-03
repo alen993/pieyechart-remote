@@ -11,17 +11,24 @@
 <meta name="theme-color" content="#6366f1">
 <style>
 :root {
-  --bg: #0a0a0f;
-  --surface: #14141f;
-  --surface2: #1e1e2e;
+  --bg: #080810;
+  --surface: #101020;
+  --surface2: #181830;
+  --surface3: #222244;
   --accent: #6366f1;
   --accent2: #818cf8;
+  --accent-glow: rgba(99,102,241,0.25);
+  --accent-glow2: rgba(99,102,241,0.12);
   --green: #22c55e;
+  --green-glow: rgba(34,197,94,0.2);
   --red: #ef4444;
+  --red-glow: rgba(239,68,68,0.2);
   --amber: #f59e0b;
   --text: #e2e8f0;
   --text2: #94a3b8;
-  --radius: 10px;
+  --text3: #64748b;
+  --radius: 14px;
+  --radius-sm: 10px;
   --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
@@ -45,19 +52,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--surface);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 14px;
+  background: linear-gradient(180deg, rgba(16,16,32,0.98) 0%, rgba(16,16,32,0.92) 100%);
+  border-bottom: 1px solid rgba(99,102,241,0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
-.logo { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+.logo { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
 .logo span { color: var(--accent2); }
 .conn-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
-.conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; }
-.conn-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; }
+.conn-dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green-glow), 0 0 2px var(--green); }
 .conn-dot.connecting { background: var(--amber); animation: pulse 1s infinite; }
 @keyframes pulse { 50% { opacity: 0.4; } }
 .conn-btn {
-  padding: 6px 14px;
+  padding: 7px 16px;
   background: var(--accent);
   border: none;
   border-radius: 20px;
@@ -65,59 +74,110 @@ body {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
-.conn-btn.disconnect { background: var(--red); }
+.conn-btn:active { transform: scale(0.95); }
+.conn-btn.disconnect { background: var(--red); box-shadow: 0 2px 8px var(--red-glow); }
 
 /* === Examiner Display === */
 .exam-display {
-  margin: 6px 10px;
-  padding: 8px 12px;
-  background: var(--surface2);
+  margin: 8px 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
   border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(99,102,241,0.12);
   text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
 }
-.exam-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 4px; }
-.exam-letters { font-size: 22px; font-weight: 700; letter-spacing: 8px; padding: 4px 0; min-height: 32px; }
-.exam-footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text2); margin-top: 2px; }
+.exam-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.exam-chart {
+  background: #fff;
+  border-radius: 8px;
+  margin: 6px 0;
+  padding: 12px 8px;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.2);
+}
+.exam-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Arial Black', 'Helvetica Neue', sans-serif;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: 0.25em;
+  line-height: 1;
+  white-space: nowrap;
+  transition: font-size 0.25s ease;
+}
+.exam-row.exam-row-active {
+  outline: 2px solid rgba(99,102,241,0.45);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.exam-svg-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  transition: height 0.25s ease;
+}
+.exam-svg-row svg { display: block; }
+.exam-special {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 1px;
+}
+.exam-special small { display: block; font-size: 10px; opacity: 0.6; font-weight: 500; margin-top: 2px; letter-spacing: 0.5px; }
+.exam-footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 2px; }
+.exam-footer .exam-contrast::before { content: 'C: '; opacity: 0.6; }
 
 /* === Tabs === */
 .tabs {
   display: flex;
-  padding: 0 10px;
+  padding: 0 12px;
   gap: 2px;
   background: var(--surface);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 .tab {
   flex: 1;
-  padding: 8px 0;
+  padding: 10px 0;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  color: var(--text2);
+  color: var(--text3);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  letter-spacing: 0.3px;
 }
 .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
 
 /* === Panels === */
-.panel { display: none; padding: 6px 10px; }
+.panel { display: none; padding: 8px 12px; }
 .panel.active { display: block; }
 
 .section-title {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text2);
-  margin: 6px 0 4px;
+  letter-spacing: 1.2px;
+  color: var(--text3);
+  margin: 8px 0 5px;
 }
 
 /* === Button Grids === */
-.btn-grid { display: grid; gap: 4px; }
+.btn-grid { display: grid; gap: 5px; }
 .cols-2 { grid-template-columns: 1fr 1fr; }
 .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 .cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
@@ -130,56 +190,127 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 6px 4px;
-  min-height: 34px;
+  padding: 8px 4px;
+  min-height: 38px;
   background: var(--surface2);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: var(--text);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.12s;
+  -webkit-user-select: none;
 }
-.cmd-btn:active { transform: scale(0.95); background: var(--accent); }
-.cmd-btn.yes { border-color: rgba(34,197,94,0.3); color: var(--green); }
-.cmd-btn.no { border-color: rgba(239,68,68,0.3); color: var(--red); }
-.cmd-btn.accent { background: var(--accent); }
+.cmd-btn:active {
+  transform: scale(0.93);
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.cmd-btn.yes {
+  border-color: rgba(34,197,94,0.25);
+  color: var(--green);
+  background: rgba(34,197,94,0.06);
+}
+.cmd-btn.yes:active { background: var(--green); color: #fff; box-shadow: 0 0 16px var(--green-glow); }
+.cmd-btn.no {
+  border-color: rgba(239,68,68,0.25);
+  color: var(--red);
+  background: rgba(239,68,68,0.06);
+}
+.cmd-btn.no:active { background: var(--red); color: #fff; box-shadow: 0 0 16px var(--red-glow); }
+.cmd-btn.accent {
+  background: var(--accent);
+  border-color: rgba(99,102,241,0.3);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+.cmd-btn.accent:active { background: var(--accent2); }
 
 /* === D-pad === */
-.dpad-container { display: flex; justify-content: center; padding: 4px 0; }
+.dpad-container { display: flex; justify-content: center; padding: 6px 0; }
 .dpad {
   display: grid;
-  grid-template-columns: 44px 44px 44px;
-  grid-template-rows: 44px 44px 44px;
-  gap: 3px;
+  grid-template-columns: 52px 52px 52px;
+  grid-template-rows: 52px 52px 52px;
+  gap: 4px;
 }
-.dpad .cmd-btn { min-height: 44px; font-size: 16px; border-radius: 8px; }
-.dpad .center { background: var(--accent); font-size: 12px; font-weight: 800; border-radius: 50%; }
-.empty { background: transparent; border: none; }
+.dpad .cmd-btn {
+  min-height: 52px;
+  font-size: 20px;
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  border: 1px solid rgba(99,102,241,0.1);
+}
+.dpad .cmd-btn:active {
+  background: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.dpad .center {
+  background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+  font-size: 13px;
+  font-weight: 800;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 4px 12px var(--accent-glow);
+  letter-spacing: 0.5px;
+}
+.dpad .center:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 20px var(--accent-glow);
+}
+.empty { background: transparent; border: none; pointer-events: none; }
 
 /* === Acuity Grid === */
 .acuity-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  gap: 5px;
 }
 .acuity-btn {
   position: relative;
   overflow: hidden;
-  padding: 6px 2px;
-  min-height: 34px;
+  padding: 8px 2px;
+  min-height: 38px;
   background: var(--surface2);
-  border: 1px solid rgba(99,102,241,0.15);
-  border-radius: 8px;
+  border: 1px solid rgba(99,102,241,0.12);
+  border-radius: var(--radius-sm);
   color: var(--accent2);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-align: center;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.12s;
+  font-family: 'Courier New', monospace;
 }
-.acuity-btn:active { transform: scale(0.95); background: var(--accent); color: white; }
+.acuity-btn:active {
+  transform: scale(0.93);
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+/* === Test Buttons — enhanced === */
+.test-grid { display: grid; gap: 5px; }
+.test-btn {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  min-height: 38px;
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.test-btn:active { transform: scale(0.95); background: var(--accent); }
+.test-btn .t-icon { font-size: 16px; width: 24px; text-align: center; opacity: 0.7; }
+.test-btn .t-label { flex: 1; }
 
 /* === Toast === */
 .toast {
@@ -187,16 +318,19 @@ body {
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
-  padding: 10px 20px;
-  background: rgba(30,30,50,0.95);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
+  padding: 10px 24px;
+  background: rgba(16,16,32,0.95);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 24px;
   color: var(--text);
   font-size: 13px;
+  font-weight: 500;
   opacity: 0;
   transition: all 0.3s;
   z-index: 200;
   pointer-events: none;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -204,18 +338,63 @@ body {
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.15);
   transform: scale(0);
   animation: ripple-anim 0.5s ease-out;
   pointer-events: none;
 }
 @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
 
+/* === Yes/No Large Buttons === */
+.yn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.yn-btn {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  min-height: 48px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s;
+  border: none;
+}
+.yn-btn.yes {
+  background: linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.08) 100%);
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,0.25);
+}
+.yn-btn.yes:active { background: var(--green); color: #fff; transform: scale(0.96); box-shadow: 0 0 20px var(--green-glow); }
+.yn-btn.no {
+  background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.08) 100%);
+  color: var(--red);
+  border: 1px solid rgba(239,68,68,0.25);
+}
+.yn-btn.no:active { background: var(--red); color: #fff; transform: scale(0.96); box-shadow: 0 0 20px var(--red-glow); }
+
+/* === Bottom Quick Actions === */
+.quick-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5px;
+  margin-top: 6px;
+}
+
 @media (orientation: landscape) {
   .panel { padding: 4px 12px; }
-  .dpad { grid-template-columns: 40px 40px 40px; grid-template-rows: 40px 40px 40px; }
-  .cmd-btn { padding: 4px 3px; min-height: 30px; }
+  .dpad { grid-template-columns: 46px 46px 46px; grid-template-rows: 46px 46px 46px; }
+  .cmd-btn { padding: 5px 3px; min-height: 32px; }
+  .yn-btn { min-height: 40px; padding: 8px; font-size: 14px; }
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -236,18 +415,18 @@ body {
     <span id="examTestName">---</span>
     <span id="examAcuity">---</span>
   </div>
-  <div class="exam-letters">
-    <span id="examLetters"><span style="color:var(--text2);font-size:13px;letter-spacing:3px;">Waiting for display...</span></span>
-  </div>
+  <!-- Mini chart preview — mirrors the OptiChart Pro layout (VX65-style). -->
+  <div class="exam-chart" id="examChart" aria-label="Mini chart preview"></div>
   <div class="exam-footer">
     <span id="examMode">---</span>
+    <span id="examContrast" class="exam-contrast">100%</span>
     <span id="examRow">---</span>
   </div>
 </div>
 
 <!-- Tabs -->
 <div class="tabs">
-  <button class="tab active" data-panel="main">Main</button>
+  <button class="tab active" data-panel="main">Control</button>
   <button class="tab" data-panel="tests">Tests</button>
   <button class="tab" data-panel="acuity">Acuity</button>
   <button class="tab" data-panel="settings">Settings</button>
@@ -255,9 +434,9 @@ body {
 
 <!-- ============ MAIN PANEL ============ -->
 <div class="panel active" id="panel-main">
-  <div class="btn-grid cols-2" style="margin-bottom:4px;">
-    <button class="cmd-btn yes" data-cmd="OUI">&#10003; YES</button>
-    <button class="cmd-btn no" data-cmd="NON">&#10007; NO</button>
+  <div class="yn-grid">
+    <button class="yn-btn yes" data-cmd="OUI">&#10003; YES</button>
+    <button class="yn-btn no" data-cmd="NON">&#10007; NO</button>
   </div>
 
   <div class="dpad-container">
@@ -274,7 +453,7 @@ body {
     </div>
   </div>
 
-  <div class="btn-grid cols-3" style="margin-bottom:4px;">
+  <div class="quick-bar">
     <button class="cmd-btn" data-cmd="RV">R/G</button>
     <button class="cmd-btn" data-cmd="INV">B/W</button>
     <button class="cmd-btn accent" data-cmd="MNU">MENU</button>
@@ -315,6 +494,12 @@ body {
     <button class="acuity-btn" data-cmd="A120">1.2</button>
     <button class="acuity-btn" data-cmd="A200">2.0</button>
   </div>
+
+  <div class="section-title" style="margin-top:12px">Fast Navigation</div>
+  <div class="btn-grid cols-2">
+    <button class="cmd-btn" data-cmd="UPFAST">&#9650;&#9650; Fast Up</button>
+    <button class="cmd-btn" data-cmd="DOWNFAST">&#9660;&#9660; Fast Down</button>
+  </div>
 </div>
 
 <!-- ============ TESTS PANEL ============ -->
@@ -324,26 +509,33 @@ body {
     <button class="cmd-btn" data-cmd="G1">G1</button>
     <button class="cmd-btn" data-cmd="G2">G2</button>
     <button class="cmd-btn" data-cmd="G3">G3</button>
-    <button class="cmd-btn accent" data-cmd="TESTS">Tests</button>
+    <button class="cmd-btn accent" data-cmd="TESTS">All</button>
   </div>
 
-  <div class="section-title">Cylinder / Astigmatism</div>
+  <div class="section-title">Binocular / Cylinder</div>
   <div class="btn-grid cols-4">
     <button class="cmd-btn" data-cmd="XCL">XCYL</button>
-    <button class="cmd-btn" data-cmd="CPT">ASTIG</button>
+    <button class="cmd-btn" data-cmd="CPT">Astig</button>
     <button class="cmd-btn" data-cmd="WOR">Worth</button>
     <button class="cmd-btn" data-cmd="SHN">SHO</button>
   </div>
 
-  <div class="section-title">Special</div>
+  <div class="section-title">Special Tests</div>
   <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="ISH">ISH</button>
-    <button class="cmd-btn" data-cmd="PTX">FIX</button>
+    <button class="cmd-btn" data-cmd="ISH">Color</button>
+    <button class="cmd-btn" data-cmd="PTX">Fix</button>
     <button class="cmd-btn" data-cmd="ACP3D">3D</button>
-    <button class="cmd-btn" data-cmd="MOV">MOV</button>
+    <button class="cmd-btn" data-cmd="MOV">Video</button>
   </div>
 
-  <div class="btn-grid cols-3" style="margin-top:4px;">
+  <div class="btn-grid cols-4" style="margin-top:5px;">
+    <button class="cmd-btn" data-cmd="PEL">Pelli</button>
+    <button class="cmd-btn" data-cmd="DUO">Duo</button>
+    <button class="cmd-btn" data-cmd="MADX">Maddox</button>
+    <button class="cmd-btn" data-cmd="AMSLR">Amsler</button>
+  </div>
+
+  <div class="btn-grid cols-3" style="margin-top:5px;">
     <button class="cmd-btn" data-cmd="IMG">EDU</button>
     <button class="cmd-btn" data-cmd="MEM">MEMO</button>
     <button class="cmd-btn accent" id="btnInfo" data-cmd="INFO">INFO</button>
@@ -361,23 +553,25 @@ body {
   <div class="section-title">WiFi Settings</div>
   <div style="display:flex;gap:6px;align-items:center;">
     <input type="text" id="wsHost" placeholder="192.168.x.x"
-      style="flex:1;padding:10px;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);
-      border-radius:8px;color:var(--text);font-size:13px;outline:none;">
-    <span style="color:var(--text2);font-size:12px;">:8070</span>
+      style="flex:1;padding:10px 12px;background:var(--surface2);border:1px solid rgba(99,102,241,0.15);
+      border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;font-family:monospace;
+      transition:border-color 0.2s;"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(99,102,241,0.15)'">
+    <span style="color:var(--text3);font-size:12px;font-weight:600;">:8070</span>
   </div>
 
   <div class="section-title">Software Update</div>
-  <button class="cmd-btn" onclick="forceUpdate()" style="width:100%;padding:12px;font-size:14px;font-weight:700;background:var(--accent);border-radius:8px;">
+  <button class="cmd-btn" onclick="forceUpdate()" style="width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg, var(--accent), #7c3aed);border:none;border-radius:var(--radius-sm);box-shadow:0 4px 12px var(--accent-glow);">
     &#x1F504; Check for Update
   </button>
-  <div id="updateStatus" style="font-size:11px;color:var(--text2);text-align:center;margin-top:4px;"></div>
+  <div id="updateStatus" style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;"></div>
 
   <div class="section-title">About</div>
-  <div style="padding:12px;background:var(--surface2);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-    <div style="font-weight:700;font-size:13px;margin-bottom:4px;">PiEyeChart Remote</div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.5;">
+  <div style="padding:14px;background:linear-gradient(135deg, var(--surface2), var(--surface3));border-radius:var(--radius);border:1px solid rgba(99,102,241,0.08);">
+    <div style="font-weight:700;font-size:14px;margin-bottom:4px;">PiEyeChart Remote</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6;">
       BLE &amp; WiFi remote control<br>
-      Version 1.2
+      Version 1.0.1
     </div>
   </div>
 </div>
@@ -420,7 +614,7 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// === Button clicks ===
+// === Button clicks (all cmd buttons including yn-btn) ===
 document.querySelectorAll('[data-cmd]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     sendCommand(btn.dataset.cmd);
@@ -459,9 +653,172 @@ function setConnStatus(status, label) {
   connBtn.className = 'conn-btn' + (connected ? ' disconnect' : '');
 }
 
+// === Local Mini-Chart State (VX65-style — mirrors what we sent) ===
+// We don't stream the screen; we track what we asked the chart to display.
+const MC_ACUITY_LEVELS = [
+  { decimal: 0.05, snellen6: '6/120', logmar: 1.30 },
+  { decimal: 0.1,  snellen6: '6/60',  logmar: 1.00 },
+  { decimal: 0.2,  snellen6: '6/30',  logmar: 0.70 },
+  { decimal: 0.25, snellen6: '6/24',  logmar: 0.60 },
+  { decimal: 0.3,  snellen6: '6/20',  logmar: 0.52 },
+  { decimal: 0.4,  snellen6: '6/15',  logmar: 0.40 },
+  { decimal: 0.5,  snellen6: '6/12',  logmar: 0.30 },
+  { decimal: 0.7,  snellen6: '6/9',   logmar: 0.15 },
+  { decimal: 0.8,  snellen6: '6/7.5', logmar: 0.10 },
+  { decimal: 1.0,  snellen6: '6/6',   logmar: 0.00 },
+  { decimal: 1.2,  snellen6: '6/5',   logmar: -0.08 },
+  { decimal: 2.0,  snellen6: '6/3',   logmar: -0.30 }
+];
+const MC_SLOAN  = 'CDHKNORSVZ'.split('');
+const MC_DIGITS = '0123456789'.split('');
+const MC_E_DEG  = [0, 90, 180, 270]; // up, right, down, left (E rotated)
+const MC_C_DEG  = [0, 45, 90, 135, 180, 225, 270, 315];
+
+const MC_ACUITY_BY_CMD = {
+  A005:0, A010:1, A020:2, A025:3, A030:4, A040:5,
+  A050:6, A070:7, A080:8, A100:9, A120:10, A200:11
+};
+const MC_TEST_BY_CMD = {
+  OAL:'letters',   OCH:'numbers',   OSN:'tumbling_e',
+  OLN:'landolt_c', OIM:'children',  OFM:'geometric',
+  ISH:'ishihara',  AMSLR:'amsler',  CPT:'clock',
+  DUO:'duochrome', MADX:'maddox',   IMG:'image',  MOV:'video'
+};
+const MC_MODE_BY_CMD = {
+  MSN:'single', MLN:'1row', M3L:'3rows', MCP:'column', MCS:'column'
+};
+
+const localState = {
+  test: 'letters',
+  acuityIdx: 6, // 6/12
+  layout: '3rows',
+  contrast: 100,
+  // pre-rendered random rows for stability between non-CHG commands
+  rows: [[], [], []],
+  eDirs: [],
+  cDirs: []
+};
+
+function mcRandomize() {
+  const set = (localState.test === 'numbers') ? MC_DIGITS : MC_SLOAN;
+  for (let r = 0; r < 3; r++) {
+    localState.rows[r] = [];
+    for (let i = 0; i < 5; i++) {
+      localState.rows[r].push(set[Math.floor(Math.random() * set.length)]);
+    }
+  }
+  localState.eDirs = Array.from({length: 5}, () => MC_E_DEG[Math.floor(Math.random()*4)]);
+  localState.cDirs = Array.from({length: 5}, () => MC_C_DEG[Math.floor(Math.random()*8)]);
+}
+mcRandomize();
+
+function applyLocalCmd(cmd) {
+  if (cmd in MC_TEST_BY_CMD) {
+    localState.test = MC_TEST_BY_CMD[cmd];
+    mcRandomize();
+  } else if (cmd in MC_MODE_BY_CMD) {
+    localState.layout = MC_MODE_BY_CMD[cmd];
+  } else if (cmd in MC_ACUITY_BY_CMD) {
+    localState.acuityIdx = MC_ACUITY_BY_CMD[cmd];
+  } else if (cmd === 'UP')       { localState.acuityIdx = Math.min(MC_ACUITY_LEVELS.length-1, localState.acuityIdx + 1); }
+  else if (cmd === 'DOWN')      { localState.acuityIdx = Math.max(0, localState.acuityIdx - 1); }
+  else if (cmd === 'UPFAST')    { localState.acuityIdx = Math.min(MC_ACUITY_LEVELS.length-1, localState.acuityIdx + 3); }
+  else if (cmd === 'DOWNFAST')  { localState.acuityIdx = Math.max(0, localState.acuityIdx - 3); }
+  else if (cmd === 'CHG')       { mcRandomize(); }
+  else if (cmd === 'LEFT')      { localState.contrast = Math.max(5,   localState.contrast - 5); }
+  else if (cmd === 'RIGHT')     { localState.contrast = Math.min(100, localState.contrast + 5); }
+  renderMiniChart();
+}
+
+// SVG renderers for the optotypes that aren't simple glyphs
+function svgE(deg, size) {
+  // Tumbling E — rotate 0/90/180/270 = up/right/down/left
+  return `<svg width="${size}" height="${size}" viewBox="0 0 50 50" style="transform:rotate(${deg}deg);transition:transform 0.2s">
+    <path fill="#000" d="M5,5 H45 V13 H15 V21 H40 V29 H15 V37 H45 V45 H5 Z"/>
+  </svg>`;
+}
+function svgC(deg, size) {
+  // Landolt C — gap on the right by default, rotate to other 8 positions
+  return `<svg width="${size}" height="${size}" viewBox="0 0 50 50" style="transform:rotate(${deg}deg);transition:transform 0.2s">
+    <path fill="#000" d="M25,5 a20,20 0 1,1 0,40 a20,20 0 0,1 0,-40 z M25,15 a10,10 0 1,0 0,20 v -3 a 7,7 0 1,1 0 -14 z"/>
+  </svg>`;
+}
+
+function renderMiniChart() {
+  const el = document.getElementById('examChart');
+  if (!el) return;
+  const t = localState.test;
+  const layout = localState.layout;
+  const idx = localState.acuityIdx;
+  const lvl = MC_ACUITY_LEVELS[idx];
+
+  // Base font size px for the CURRENT acuity row.
+  // Container is roughly 240px wide × 110px tall on most phones.
+  // Smaller acuity → bigger optotype.
+  const base = Math.round(14 + (12 - idx) * 1.3); // 14 → 28
+  const sizes = (layout === '3rows')
+    ? [Math.round(base * 1.4), Math.round(base * 1.15), base]
+    : [base];
+
+  const isText  = ['letters','numbers','children','geometric'].includes(t);
+  const isE     = (t === 'tumbling_e');
+  const isC     = (t === 'landolt_c');
+  const special = ['ishihara','amsler','duochrome','maddox','clock','image','video'].includes(t);
+
+  let html = '';
+  if (special) {
+    html = `<div class="exam-special">${t.replace('_',' ').toUpperCase()}<small>special test • ${lvl.snellen6}</small></div>`;
+  } else if (layout === 'single') {
+    const px = Math.round(base * 1.6);
+    if (isText) {
+      html = `<div class="exam-row" style="font-size:${px}px">${localState.rows[1][2] || 'C'}</div>`;
+    } else if (isE) {
+      html = `<div class="exam-svg-row" style="height:${px}px">${svgE(localState.eDirs[2] || 0, px)}</div>`;
+    } else if (isC) {
+      html = `<div class="exam-svg-row" style="height:${px}px">${svgC(localState.cDirs[2] || 0, px)}</div>`;
+    }
+  } else if (layout === '1row' || layout === 'column') {
+    if (isText) {
+      html = `<div class="exam-row exam-row-active" style="font-size:${base}px">${localState.rows[1].join('')}</div>`;
+    } else if (isE) {
+      html = `<div class="exam-svg-row" style="height:${base}px">${localState.eDirs.map(d => svgE(d, base)).join('')}</div>`;
+    } else if (isC) {
+      html = `<div class="exam-svg-row" style="height:${base}px">${localState.cDirs.map(d => svgC(d, base)).join('')}</div>`;
+    }
+  } else {
+    // 3rows
+    for (let r = 0; r < 3; r++) {
+      const px = sizes[r];
+      const active = (r === 2) ? ' exam-row-active' : ''; // current acuity = bottom row
+      if (isText) {
+        html += `<div class="exam-row${active}" style="font-size:${px}px">${localState.rows[r].join('')}</div>`;
+      } else if (isE) {
+        html += `<div class="exam-svg-row" style="height:${px}px">${
+          Array.from({length:3}, () => svgE(MC_E_DEG[Math.floor((localState.eDirs[r]||0)/90 + r) % 4], px)).join('')
+        }</div>`;
+      } else if (isC) {
+        html += `<div class="exam-svg-row" style="height:${px}px">${
+          Array.from({length:3}, (_,i) => svgC(MC_C_DEG[(i + r) % 8], px)).join('')
+        }</div>`;
+      }
+    }
+  }
+
+  el.innerHTML = html;
+
+  // Update the metadata strip below the chart
+  const setText = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  setText('examTestName', t.replace(/_/g, ' ').toUpperCase());
+  setText('examAcuity',   lvl.snellen6);
+  setText('examMode',     layout);
+  setText('examRow',      `Row ${idx + 1}/${MC_ACUITY_LEVELS.length}`);
+  setText('examContrast', localState.contrast + '%');
+}
+
 // === Send Command ===
 function sendCommand(cmd) {
-  mode === 'ble' ? sendBLE(cmd) : sendWS(cmd);
+  applyLocalCmd(cmd);                                 // update mini-chart immediately
+  mode === 'ble' ? sendBLE(cmd) : sendWS(cmd);        // dispatch to chart
 }
 
 // === BLE ===
@@ -525,6 +882,9 @@ function connectWS() {
       try {
         const msg = JSON.parse(event.data);
         if (msg.type === 'display_state') updateExaminerDisplay(msg);
+        if (msg.type === 'action' && msg.action) {
+          showToast('⚡ ' + msg.action);
+        }
       } catch(e) {}
     };
     ws.onclose = () => { setConnStatus('', 'Disconnected'); ws = null; };
@@ -553,18 +913,23 @@ function toggleConnection() {
 }
 
 // === Examiner Display ===
+// Optional: if the chart broadcasts its state via WS we sync the mini-chart
+// to it. Without WS we still render locally from sent commands (VX65-style).
 function updateExaminerDisplay(state) {
-  if (state.test) document.getElementById('examTestName').textContent = state.test.replace(/_/g, ' ').toUpperCase();
-  if (state.acuity) document.getElementById('examAcuity').textContent = state.acuity;
-  if (state.letters) {
-    const el = document.getElementById('examLetters');
-    el.innerHTML = '';
-    const span = document.createElement('span');
-    span.textContent = state.letters;
-    el.appendChild(span);
+  let touched = false;
+  if (state.test) {
+    const norm = state.test.toLowerCase().replace(/ /g,'_');
+    if (norm !== localState.test) { localState.test = norm; touched = true; }
   }
-  if (state.mode) document.getElementById('examMode').textContent = state.mode;
-  if (state.row !== undefined) document.getElementById('examRow').textContent = 'Row ' + (state.row + 1);
+  if (state.mode && state.mode !== localState.layout) {
+    localState.layout = state.mode;
+    touched = true;
+  }
+  if (state.row !== undefined && state.row !== localState.acuityIdx) {
+    localState.acuityIdx = Math.max(0, Math.min(MC_ACUITY_LEVELS.length - 1, state.row));
+    touched = true;
+  }
+  if (touched) renderMiniChart();
 }
 
 // === Force Update ===
@@ -590,9 +955,17 @@ function forceUpdate() {
 }
 
 // === Init ===
-setMode('ble');
+if (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  document.getElementById('wsHost').value = window.location.hostname;
+  setMode('ws');
+} else {
+  setMode('ble');
+}
 
-// === INFO long-press: hold to keep zoomed, release → 3s timer ===
+// First render of the mini-chart so the user sees something before any command.
+renderMiniChart();
+
+// === INFO long-press ===
 const btnInfo = document.getElementById('btnInfo');
 let infoHoldInterval = null;
 btnInfo.addEventListener('touchstart', (e) => {
@@ -600,14 +973,8 @@ btnInfo.addEventListener('touchstart', (e) => {
   sendCommand('INFO');
   infoHoldInterval = setInterval(() => sendCommand('INFO'), 500);
 }, { passive: false });
-btnInfo.addEventListener('touchend', () => {
-  clearInterval(infoHoldInterval);
-  infoHoldInterval = null;
-});
-btnInfo.addEventListener('touchcancel', () => {
-  clearInterval(infoHoldInterval);
-  infoHoldInterval = null;
-});
+btnInfo.addEventListener('touchend', () => { clearInterval(infoHoldInterval); infoHoldInterval = null; });
+btnInfo.addEventListener('touchcancel', () => { clearInterval(infoHoldInterval); infoHoldInterval = null; });
 
 // === Service Worker ===
 if ('serviceWorker' in navigator) {
