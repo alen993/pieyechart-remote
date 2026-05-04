@@ -975,41 +975,61 @@ async function connectBLE() {
       });
     }
     bleDevice.addEventListener('gattserverdisconnected', () => {
-      setConnStatus('', 'Disconnected');
       bleCmdChar = null;
-      showToast('BLE disconnected');
+      // Try silent auto-reconnect a few times before giving up — the user
+      // already authorized this device, so no chooser dialog needed.
+      let attempts = 0;
+      const tryReconnect = () => {
+        if (!bleDevice) return;
+        attempts++;
+        setConnStatus('connecting', `Reconnecting (${attempts})...`);
+        bleDevice.gatt.connect()
+          .then(server => bleReinit(server))
+          .catch(err => {
+            if (attempts < 6) {
+              setTimeout(tryReconnect, 1500);
+            } else {
+              setConnStatus('', 'Disconnected');
+              showToast('BLE disconnected');
+            }
+          });
+      };
+      tryReconnect();
     });
     setConnStatus('connecting', 'Connecting...');
-    bleServer = await bleDevice.gatt.connect();
-    const service = await bleServer.getPrimaryService(BLE_SERVICE_UUID);
-    setConnStatus('connecting', 'Authenticating...');
-    const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
-    await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
-    bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
-
-    // Subscribe to STATUS_CHAR notifications so the mini-chart syncs with
-    // the main screen over Bluetooth (mirrors the WiFi flow).
-    try {
-      const statusChar = await service.getCharacteristic(BLE_STATUS_CHAR_UUID);
-      await statusChar.startNotifications();
-      statusChar.addEventListener('characteristicvaluechanged', (ev) => {
-        try {
-          const text = new TextDecoder().decode(ev.target.value);
-          const msg = JSON.parse(text);
-          if (msg && msg.type === 'display_state') updateExaminerDisplay(msg);
-        } catch (_) { /* ignore malformed notifies */ }
-      });
-    } catch (e) {
-      console.warn('[BLE] status char subscribe failed:', e.message);
-    }
-
-    setConnStatus('connected', 'BLE Connected');
-    showToast('Connected via Bluetooth');
+    const server = await bleDevice.gatt.connect();
+    await bleReinit(server);
   } catch (err) {
     console.error('[BLE]', err);
     setConnStatus('', 'Disconnected');
     if (err.name !== 'NotFoundError') showToast('BLE error: ' + err.message);
   }
+}
+
+// Initialize / re-initialize the GATT services after a successful connect.
+// Used by both first-time connect and the auto-reconnect path.
+async function bleReinit(server) {
+  bleServer = server;
+  const service = await server.getPrimaryService(BLE_SERVICE_UUID);
+  setConnStatus('connecting', 'Authenticating...');
+  const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
+  await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
+  bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
+  try {
+    const statusChar = await service.getCharacteristic(BLE_STATUS_CHAR_UUID);
+    await statusChar.startNotifications();
+    statusChar.addEventListener('characteristicvaluechanged', (ev) => {
+      try {
+        const text = new TextDecoder().decode(ev.target.value);
+        const msg = JSON.parse(text);
+        if (msg && msg.type === 'display_state') updateExaminerDisplay(msg);
+      } catch (_) { /* malformed notify — ignore */ }
+    });
+  } catch (e) {
+    console.warn('[BLE] status char subscribe failed:', e.message);
+  }
+  setConnStatus('connected', 'BLE Connected');
+  showToast('Connected via Bluetooth');
 }
 
 function disconnectBLE() {
