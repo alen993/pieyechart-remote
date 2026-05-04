@@ -918,7 +918,11 @@ function sendTypeText() {
 
 // === BLE ===
 async function connectBLE() {
-  if (!navigator.bluetooth) { showToast('Bluetooth not available'); return; }
+  if (!navigator.bluetooth) {
+    showToast('Bluetooth not available — open in Chrome/Edge over HTTPS');
+    setConnStatus('', 'Bluetooth unsupported');
+    return;
+  }
   try {
     setConnStatus('connecting', 'Scanning...');
     bleDevice = await navigator.bluetooth.requestDevice({
@@ -930,19 +934,35 @@ async function connectBLE() {
       bleCmdChar = null;
       showToast('BLE disconnected');
     });
-    setConnStatus('connecting', 'Connecting...');
-    bleServer = await bleDevice.gatt.connect();
+    setConnStatus('connecting', 'Connecting GATT...');
+    bleServer = await Promise.race([
+      bleDevice.gatt.connect(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('GATT connect timeout (10s)')), 10000))
+    ]);
+    setConnStatus('connecting', 'Reading service...');
     const service = await bleServer.getPrimaryService(BLE_SERVICE_UUID);
     setConnStatus('connecting', 'Authenticating...');
     const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
     await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
     bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
+    // Remember device id so future opens can offer a fast reconnect button
+    try { localStorage.setItem('pec_ble_device_name', bleDevice.name || 'PiEyeChart'); } catch (_) {}
     setConnStatus('connected', 'BLE Connected');
     showToast('Connected via Bluetooth');
   } catch (err) {
     console.error('[BLE]', err);
     setConnStatus('', 'Disconnected');
-    if (err.name !== 'NotFoundError') showToast('BLE error: ' + err.message);
+    if (err.name === 'NotFoundError') {
+      // User cancelled the picker — silent
+    } else if (err.name === 'NetworkError' || /timeout/i.test(err.message || '')) {
+      showToast('BLE timeout — turn Bluetooth off and on, then retry');
+    } else if (err.name === 'SecurityError') {
+      showToast('Page must be HTTPS for Web Bluetooth');
+    } else if (err.name === 'NotSupportedError') {
+      showToast('Browser does not support Bluetooth on this page');
+    } else {
+      showToast('BLE: ' + (err.message || err.name || 'unknown error'));
+    }
   }
 }
 
