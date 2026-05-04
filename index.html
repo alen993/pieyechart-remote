@@ -121,6 +121,26 @@ body {
   outline-offset: 4px;
   border-radius: 4px;
 }
+.exam-row-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+  padding: 2px 4px;
+}
+.exam-row-line .exam-row {
+  flex: 1;
+  text-align: center;
+}
+.exam-row-line .exam-row-acu {
+  font-size: 11px;
+  color: #555;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  min-width: 36px;
+  text-align: right;
+}
 .exam-svg-row {
   display: flex;
   align-items: center;
@@ -512,32 +532,71 @@ body {
     <button class="cmd-btn accent" data-cmd="TESTS">All</button>
   </div>
 
+  <div class="section-title">Optotypes</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="OAL">Letters</button>
+    <button class="cmd-btn" data-cmd="OCH">Numbers</button>
+    <button class="cmd-btn" data-cmd="OSN">E</button>
+    <button class="cmd-btn" data-cmd="OLN">C</button>
+  </div>
+  <div class="btn-grid cols-4" style="margin-top:5px;">
+    <button class="cmd-btn" data-cmd="OIM">Kids</button>
+    <button class="cmd-btn" data-cmd="OFM">Shapes</button>
+    <button class="cmd-btn" data-cmd="OSH">Sheridan</button>
+    <button class="cmd-btn" data-cmd="OET">ETDRS</button>
+  </div>
+
   <div class="section-title">Binocular / Cylinder</div>
   <div class="btn-grid cols-4">
     <button class="cmd-btn" data-cmd="XCL">XCYL</button>
-    <button class="cmd-btn" data-cmd="CPT">Astig</button>
+    <button class="cmd-btn" data-cmd="CPT">Astig12</button>
+    <button class="cmd-btn" data-cmd="CP6">Astig6</button>
     <button class="cmd-btn" data-cmd="WOR">Worth</button>
-    <button class="cmd-btn" data-cmd="SHN">SHO</button>
   </div>
-
-  <div class="section-title">Special Tests</div>
-  <div class="btn-grid cols-4">
-    <button class="cmd-btn" data-cmd="ISH">Color</button>
-    <button class="cmd-btn" data-cmd="PTX">Fix</button>
-    <button class="cmd-btn" data-cmd="ACP3D">3D</button>
-    <button class="cmd-btn" data-cmd="MOV">Video</button>
-  </div>
-
   <div class="btn-grid cols-4" style="margin-top:5px;">
-    <button class="cmd-btn" data-cmd="PEL">Pelli</button>
-    <button class="cmd-btn" data-cmd="DUO">Duo</button>
+    <button class="cmd-btn" data-cmd="SHN">Schober</button>
     <button class="cmd-btn" data-cmd="MADX">Maddox</button>
-    <button class="cmd-btn" data-cmd="AMSLR">Amsler</button>
+    <button class="cmd-btn" data-cmd="BAG">Bagolini</button>
+    <button class="cmd-btn" data-cmd="PHO">Phoria</button>
+  </div>
+  <div class="btn-grid cols-4" style="margin-top:5px;">
+    <button class="cmd-btn" data-cmd="FBI">Fus-V</button>
+    <button class="cmd-btn" data-cmd="FBH">Fus-H</button>
+    <button class="cmd-btn" data-cmd="MK1">MKH 1</button>
+    <button class="cmd-btn" data-cmd="MK2">MKH 2</button>
   </div>
 
-  <div class="btn-grid cols-3" style="margin-top:5px;">
-    <button class="cmd-btn" data-cmd="IMG">EDU</button>
+  <div class="section-title">Color &amp; Contrast</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="ISH">Ishihara</button>
+    <button class="cmd-btn" data-cmd="DUO">Duo R/G</button>
+    <button class="cmd-btn" data-cmd="PEL">Pelli</button>
+    <button class="cmd-btn" data-cmd="CTL">Contrast</button>
+  </div>
+  <div class="btn-grid cols-4" style="margin-top:5px;">
+    <button class="cmd-btn" data-cmd="RDS">RedDesat</button>
+    <button class="cmd-btn" data-cmd="CRW">Crowding</button>
+    <button class="cmd-btn" data-cmd="BLN">BinBal</button>
+    <button class="cmd-btn" data-cmd="NRV">Near</button>
+  </div>
+
+  <div class="section-title">Specialty</div>
+  <div class="btn-grid cols-4">
+    <button class="cmd-btn" data-cmd="AMSLR">Amsler</button>
+    <button class="cmd-btn" data-cmd="PTX">Fixation</button>
+    <button class="cmd-btn" data-cmd="ACP3D">3D</button>
+    <button class="cmd-btn" data-cmd="DOT">Dot</button>
+  </div>
+  <div class="btn-grid cols-4" style="margin-top:5px;">
+    <button class="cmd-btn" data-cmd="JCR">Jackson</button>
+    <button class="cmd-btn" data-cmd="TGS">Tangent</button>
+    <button class="cmd-btn" data-cmd="MOV">Video</button>
+    <button class="cmd-btn" data-cmd="IMG">Edu</button>
+  </div>
+
+  <div class="btn-grid cols-3" style="margin-top:8px;">
     <button class="cmd-btn" data-cmd="MEM">MEMO</button>
+    <button class="cmd-btn" data-cmd="HOM">HOME</button>
     <button class="cmd-btn accent" id="btnInfo" data-cmd="INFO">INFO</button>
   </div>
 </div>
@@ -734,10 +793,10 @@ function applyLocalCmd(cmd) {
     localState.layout = MC_MODE_BY_CMD[cmd];
   } else if (cmd in MC_ACUITY_BY_CMD) {
     localState.acuityIdx = MC_ACUITY_BY_CMD[cmd];
-  } else if (cmd === 'UP')       { localState.acuityIdx = Math.min(MC_ACUITY_LEVELS.length-1, localState.acuityIdx + 1); }
-  else if (cmd === 'DOWN')      { localState.acuityIdx = Math.max(0, localState.acuityIdx - 1); }
-  else if (cmd === 'UPFAST')    { localState.acuityIdx = Math.min(MC_ACUITY_LEVELS.length-1, localState.acuityIdx + 3); }
-  else if (cmd === 'DOWNFAST')  { localState.acuityIdx = Math.max(0, localState.acuityIdx - 3); }
+  } else if (cmd === 'UP')       { localState.acuityIdx = Math.max(0, localState.acuityIdx - 1); }                                  // UP = bigger letter (smaller idx)
+  else if (cmd === 'DOWN')      { localState.acuityIdx = Math.min(MC_ACUITY_LEVELS.length-1, localState.acuityIdx + 1); }            // DOWN = smaller letter (larger idx)
+  else if (cmd === 'UPFAST')    { localState.acuityIdx = Math.max(0, localState.acuityIdx - 3); }
+  else if (cmd === 'DOWNFAST')  { localState.acuityIdx = Math.min(MC_ACUITY_LEVELS.length-1, localState.acuityIdx + 3); }
   else if (cmd === 'CHG')       { mcRandomize(); }
   else if (cmd === 'LEFT')      { localState.contrast = Math.max(5,   localState.contrast - 5); }
   else if (cmd === 'RIGHT')     { localState.contrast = Math.min(100, localState.contrast + 5); }
@@ -764,57 +823,39 @@ function renderMiniChart() {
   const t = localState.test;
   const layout = localState.layout;
   const idx = localState.acuityIdx;
-  const lvl = MC_ACUITY_LEVELS[idx];
+  const lvl = MC_ACUITY_LEVELS[idx] || MC_ACUITY_LEVELS[MC_ACUITY_LEVELS.length-1];
 
-  // Base font size px for the CURRENT acuity row.
-  // Container is roughly 240px wide × 110px tall on most phones.
-  // Smaller acuity → bigger optotype.
-  const base = Math.round(14 + (12 - idx) * 1.3); // 14 → 28
-  const sizes = (layout === '3rows')
-    ? [Math.round(base * 1.4), Math.round(base * 1.15), base]
-    : [base];
+  // Fixed font size — phone display does NOT scale with acuity.
+  // The size label on the side is what tells the examiner the acuity.
+  const FIXED_PX = 24;
 
-  const isText  = ['letters','numbers','children','geometric'].includes(t);
-  const isE     = (t === 'tumbling_e');
-  const isC     = (t === 'landolt_c');
   const special = ['ishihara','amsler','duochrome','maddox','clock','image','video'].includes(t);
 
   let html = '';
   if (special) {
-    html = `<div class="exam-special">${t.replace('_',' ').toUpperCase()}<small>special test • ${lvl.snellen6}</small></div>`;
-  } else if (layout === 'single') {
-    const px = Math.round(base * 1.6);
-    if (isText) {
-      html = `<div class="exam-row" style="font-size:${px}px">${localState.rows[1][2] || 'C'}</div>`;
-    } else if (isE) {
-      html = `<div class="exam-svg-row" style="height:${px}px">${svgE(localState.eDirs[2] || 0, px)}</div>`;
-    } else if (isC) {
-      html = `<div class="exam-svg-row" style="height:${px}px">${svgC(localState.cDirs[2] || 0, px)}</div>`;
-    }
-  } else if (layout === '1row' || layout === 'column') {
-    if (isText) {
-      html = `<div class="exam-row exam-row-active" style="font-size:${base}px">${localState.rows[1].join('')}</div>`;
-    } else if (isE) {
-      html = `<div class="exam-svg-row" style="height:${base}px">${localState.eDirs.map(d => svgE(d, base)).join('')}</div>`;
-    } else if (isC) {
-      html = `<div class="exam-svg-row" style="height:${base}px">${localState.cDirs.map(d => svgC(d, base)).join('')}</div>`;
-    }
+    html = `<div class="exam-special">${t.replace('_',' ').toUpperCase()}<small>special test • ${(localState.syncedAcuity || (lvl && lvl.snellen6) || '')}</small></div>`;
+  } else if (Array.isArray(localState.syncedRows) && localState.syncedRows.length) {
+    // Authoritative one-to-one render of what's on the main screen.
+    const rows = localState.syncedRows;
+    const acus = localState.syncedRowAcuities || [];
+    rows.forEach((rowText, i) => {
+      const acu = acus[i] || localState.syncedAcuity || '';
+      html += `<div class="exam-row-line">
+        <div class="exam-row" style="font-size:${FIXED_PX}px">${rowText}</div>
+        <div class="exam-row-acu">${acu}</div>
+      </div>`;
+    });
   } else {
-    // 3rows
-    for (let r = 0; r < 3; r++) {
-      const px = sizes[r];
-      const active = (r === 2) ? ' exam-row-active' : ''; // current acuity = bottom row
-      if (isText) {
-        html += `<div class="exam-row${active}" style="font-size:${px}px">${localState.rows[r].join('')}</div>`;
-      } else if (isE) {
-        html += `<div class="exam-svg-row" style="height:${px}px">${
-          Array.from({length:3}, () => svgE(MC_E_DEG[Math.floor((localState.eDirs[r]||0)/90 + r) % 4], px)).join('')
-        }</div>`;
-      } else if (isC) {
-        html += `<div class="exam-svg-row" style="height:${px}px">${
-          Array.from({length:3}, (_,i) => svgC(MC_C_DEG[(i + r) % 8], px)).join('')
-        }</div>`;
-      }
+    // Fallback: no state from chart yet — show local-state preview
+    const isText  = ['letters','numbers','children','geometric'].includes(t);
+    const isE     = (t === 'tumbling_e');
+    const isC     = (t === 'landolt_c');
+    if (isText) {
+      html = `<div class="exam-row" style="font-size:${FIXED_PX}px">${(localState.rows[1] || []).join('')}</div>`;
+    } else if (isE) {
+      html = `<div class="exam-svg-row" style="height:${FIXED_PX}px">${(localState.eDirs || []).map(d => svgE(d, FIXED_PX)).join('')}</div>`;
+    } else if (isC) {
+      html = `<div class="exam-svg-row" style="height:${FIXED_PX}px">${(localState.cDirs || []).map(d => svgC(d, FIXED_PX)).join('')}</div>`;
     }
   }
 
@@ -980,7 +1021,14 @@ function updateExaminerDisplay(state) {
     touched = true;
   }
   if (state.row !== undefined && state.row !== localState.acuityIdx) {
-    localState.acuityIdx = Math.max(0, Math.min(MC_ACUITY_LEVELS.length - 1, state.row));
+    localState.acuityIdx = state.row;
+    touched = true;
+  }
+  // Sync actual displayed rows from the screen — exact one-to-one match
+  if (Array.isArray(state.rows) && state.rows.length) {
+    localState.syncedRows = state.rows;
+    localState.syncedRowAcuities = Array.isArray(state.rowAcuities) ? state.rowAcuities : [];
+    localState.syncedAcuity = state.acuity || '';
     touched = true;
   }
   if (touched) renderMiniChart();
