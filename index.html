@@ -421,7 +421,7 @@ body {
 
 <!-- Connection Bar -->
 <div class="conn-bar">
-  <div class="logo">Pi<span>Eye</span>Chart <span style="font-size:9px;opacity:0.5;font-weight:400" id="pwaVer">v12</span></div>
+  <div class="logo">Pi<span>Eye</span>Chart <span style="font-size:9px;opacity:0.5;font-weight:400" id="pwaVer">v13</span></div>
   <div class="conn-status">
     <div class="conn-dot" id="connDot"></div>
     <span id="connLabel">Disconnected</span>
@@ -941,6 +941,23 @@ async function connectBLE() {
     const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
     await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
     bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
+
+    // Subscribe to STATUS_CHAR notifications so the mini-chart syncs with
+    // the main screen over Bluetooth (mirrors the WiFi flow).
+    try {
+      const statusChar = await service.getCharacteristic(BLE_STATUS_CHAR_UUID);
+      await statusChar.startNotifications();
+      statusChar.addEventListener('characteristicvaluechanged', (ev) => {
+        try {
+          const text = new TextDecoder().decode(ev.target.value);
+          const msg = JSON.parse(text);
+          if (msg && msg.type === 'display_state') updateExaminerDisplay(msg);
+        } catch (_) { /* ignore malformed notifies */ }
+      });
+    } catch (e) {
+      console.warn('[BLE] status char subscribe failed:', e.message);
+    }
+
     setConnStatus('connected', 'BLE Connected');
     showToast('Connected via Bluetooth');
   } catch (err) {
