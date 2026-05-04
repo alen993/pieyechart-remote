@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pieyechart-remote-v11';
+const CACHE_NAME = 'pieyechart-remote-v12';
 const ASSETS = [
   './',
   './index.html',
