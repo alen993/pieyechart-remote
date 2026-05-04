@@ -96,14 +96,34 @@ body {
   border-radius: 8px;
   margin: 6px 0;
   padding: 12px 8px;
-  min-height: 110px;
+  /* Fixed height so the card doesn't shrink/grow with row count */
+  height: 160px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   gap: 8px;
   box-shadow: inset 0 1px 0 rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.2);
+  overflow: hidden;
+  position: relative;
+  transition: background 0.25s ease;
 }
+/* Background-mode mirroring */
+.exam-chart.bg-bw { background: #000; }
+.exam-chart.bg-bw .exam-row { color: #fff; }
+.exam-chart.bg-bw .exam-row-line .exam-row-acu { color: #94a3b8; }
+.exam-chart.bg-bw .exam-special, .exam-chart.bg-bw .exam-ph-title { color: #fff; }
+.exam-chart.bg-bw .exam-ph-text { color: #94a3b8; }
+
+.exam-chart.bg-rg {
+  background: linear-gradient(90deg, #dc2626 50%, #16a34a 50%);
+  padding: 12px 4px;
+}
+.exam-chart.bg-rg .exam-row {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+}
+.exam-chart.bg-rg .exam-row-line .exam-row-acu { color: rgba(255,255,255,0.85); }
 .exam-row {
   display: flex;
   align-items: center;
@@ -156,6 +176,15 @@ body {
   color: #1e293b;
   letter-spacing: 1px;
 }
+.exam-placeholder {
+  text-align: center;
+  padding: 12px 8px;
+  color: #475569;
+}
+.exam-ph-icon { font-size: 28px; margin-bottom: 6px; opacity: 0.7; }
+.exam-ph-title { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 4px; letter-spacing: 0.3px; }
+.exam-ph-text { font-size: 11px; color: #64748b; line-height: 1.4; }
+.exam-ph-text b { color: #1e293b; }
 .exam-special small { display: block; font-size: 10px; opacity: 0.6; font-weight: 500; margin-top: 2px; letter-spacing: 0.5px; }
 .exam-footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 2px; }
 .exam-footer .exam-contrast::before { content: 'C: '; opacity: 0.6; }
@@ -421,7 +450,7 @@ body {
 
 <!-- Connection Bar -->
 <div class="conn-bar">
-  <div class="logo">Pi<span>Eye</span>Chart <span style="font-size:9px;opacity:0.5;font-weight:400" id="pwaVer">v13</span></div>
+  <div class="logo">Pi<span>Eye</span>Chart <span style="font-size:9px;opacity:0.5;font-weight:400">v1.0.0</span></div>
   <div class="conn-status">
     <div class="conn-dot" id="connDot"></div>
     <span id="connLabel">Disconnected</span>
@@ -433,14 +462,12 @@ body {
 <div class="exam-display" id="examDisplay">
   <div class="exam-header">
     <span id="examTestName">---</span>
-    <span id="examAcuity">---</span>
+    <span id="examMode">---</span>
   </div>
   <!-- Mini chart preview — mirrors the OptiChart Pro layout (VX65-style). -->
   <div class="exam-chart" id="examChart" aria-label="Mini chart preview"></div>
   <div class="exam-footer">
-    <span id="examMode">---</span>
     <span id="examContrast" class="exam-contrast">100%</span>
-    <span id="examRow">---</span>
   </div>
 </div>
 
@@ -825,6 +852,11 @@ function renderMiniChart() {
   const idx = localState.acuityIdx;
   const lvl = MC_ACUITY_LEVELS[idx] || MC_ACUITY_LEVELS[MC_ACUITY_LEVELS.length-1];
 
+  // Apply background-mode mirroring (white / B-W / R-G split)
+  el.classList.remove('bg-bw', 'bg-rg');
+  if (localState.syncedBackground === 'black')    el.classList.add('bg-bw');
+  if (localState.syncedBackground === 'redgreen') el.classList.add('bg-rg');
+
   // Fixed font size — phone display does NOT scale with acuity.
   // The size label on the side is what tells the examiner the acuity.
   const FIXED_PX = 24;
@@ -832,9 +864,18 @@ function renderMiniChart() {
   const special = ['ishihara','amsler','duochrome','maddox','clock','image','video'].includes(t);
 
   let html = '';
-  if (special) {
+  const haveSync = Array.isArray(localState.syncedRows) && localState.syncedRows.length;
+
+  if (!connected && !haveSync) {
+    // No connection yet — explain instead of showing random local placeholder.
+    html = `<div class="exam-placeholder">
+      <div class="exam-ph-icon">📡</div>
+      <div class="exam-ph-title">Not connected</div>
+      <div class="exam-ph-text">Tap <b>Connect</b> above to mirror the chart screen here.</div>
+    </div>`;
+  } else if (special) {
     html = `<div class="exam-special">${t.replace('_',' ').toUpperCase()}<small>special test • ${(localState.syncedAcuity || (lvl && lvl.snellen6) || '')}</small></div>`;
-  } else if (Array.isArray(localState.syncedRows) && localState.syncedRows.length) {
+  } else if (haveSync) {
     // Authoritative one-to-one render of what's on the main screen.
     const rows = localState.syncedRows;
     const acus = localState.syncedRowAcuities || [];
@@ -846,17 +887,11 @@ function renderMiniChart() {
       </div>`;
     });
   } else {
-    // Fallback: no state from chart yet — show local-state preview
-    const isText  = ['letters','numbers','children','geometric'].includes(t);
-    const isE     = (t === 'tumbling_e');
-    const isC     = (t === 'landolt_c');
-    if (isText) {
-      html = `<div class="exam-row" style="font-size:${FIXED_PX}px">${(localState.rows[1] || []).join('')}</div>`;
-    } else if (isE) {
-      html = `<div class="exam-svg-row" style="height:${FIXED_PX}px">${(localState.eDirs || []).map(d => svgE(d, FIXED_PX)).join('')}</div>`;
-    } else if (isC) {
-      html = `<div class="exam-svg-row" style="height:${FIXED_PX}px">${(localState.cDirs || []).map(d => svgC(d, FIXED_PX)).join('')}</div>`;
-    }
+    // Connected but no state yet — brief 'waiting' message.
+    html = `<div class="exam-placeholder">
+      <div class="exam-ph-title">Waiting for chart…</div>
+      <div class="exam-ph-text">Press any key on the chart to start.</div>
+    </div>`;
   }
 
   el.innerHTML = html;
@@ -864,9 +899,7 @@ function renderMiniChart() {
   // Update the metadata strip below the chart
   const setText = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
   setText('examTestName', t.replace(/_/g, ' ').toUpperCase());
-  setText('examAcuity',   lvl.snellen6);
-  setText('examMode',     layout);
-  setText('examRow',      `Row ${idx + 1}/${MC_ACUITY_LEVELS.length}`);
+  setText('examMode',     (layout || '').toUpperCase());
   setText('examContrast', localState.contrast + '%');
 }
 
@@ -924,11 +957,23 @@ async function connectBLE() {
     return;
   }
   try {
-    setConnStatus('connecting', 'Scanning...');
-    bleDevice = await navigator.bluetooth.requestDevice({
-      filters: [{ name: 'PiEyeChart' }],
-      optionalServices: [BLE_SERVICE_UUID]
-    });
+    // Try fast-reconnect: skip the chooser if the user has already
+    // authorized PiEyeChart in a previous session.
+    bleDevice = null;
+    if (typeof navigator.bluetooth.getDevices === 'function') {
+      try {
+        const known = await navigator.bluetooth.getDevices();
+        bleDevice = known.find(d => (d.name || '') === 'PiEyeChart') || null;
+        if (bleDevice) setConnStatus('connecting', 'Reconnecting...');
+      } catch (_) { /* getDevices is gated on some browsers — fall back */ }
+    }
+    if (!bleDevice) {
+      setConnStatus('connecting', 'Scanning...');
+      bleDevice = await navigator.bluetooth.requestDevice({
+        filters: [{ name: 'PiEyeChart' }],
+        optionalServices: [BLE_SERVICE_UUID]
+      });
+    }
     bleDevice.addEventListener('gattserverdisconnected', () => {
       setConnStatus('', 'Disconnected');
       bleCmdChar = null;
@@ -1051,6 +1096,11 @@ function updateExaminerDisplay(state) {
     localState.syncedRows = state.rows;
     localState.syncedRowAcuities = Array.isArray(state.rowAcuities) ? state.rowAcuities : [];
     localState.syncedAcuity = state.acuity || '';
+    touched = true;
+  }
+  // Background mode: 'white' | 'black' | 'redgreen'
+  if (state.background && state.background !== localState.syncedBackground) {
+    localState.syncedBackground = state.background;
     touched = true;
   }
   if (touched) renderMiniChart();
