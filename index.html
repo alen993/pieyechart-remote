@@ -829,8 +829,33 @@ function renderMiniChart() {
   setText('examContrast', localState.contrast + '%');
 }
 
+// === Click sound (Web Audio — no external file) ===
+let _audioCtx;
+function clickSound() {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    const o = _audioCtx.createOscillator();
+    const g = _audioCtx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(1500, _audioCtx.currentTime);
+    g.gain.setValueAtTime(0.0001, _audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.06, _audioCtx.currentTime + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, _audioCtx.currentTime + 0.05);
+    o.connect(g); g.connect(_audioCtx.destination);
+    o.start(); o.stop(_audioCtx.currentTime + 0.06);
+  } catch (e) { /* ignore — audio is optional */ }
+}
+
+// === Haptic + sound feedback per key press ===
+function feedbackTap() {
+  clickSound();
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+
 // === Send Command ===
 function sendCommand(cmd) {
+  feedbackTap();                                      // audible + haptic feedback
   applyLocalCmd(cmd);                                 // update mini-chart immediately
   mode === 'ble' ? sendBLE(cmd) : sendWS(cmd);        // dispatch to chart
 }
