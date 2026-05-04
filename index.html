@@ -1004,6 +1004,7 @@ function setMode(m) {
   document.getElementById('btnModeBLE').className = 'cmd-btn' + (m === 'ble' ? ' accent' : '');
   document.getElementById('btnModeWS').className = 'cmd-btn' + (m === 'ws' ? ' accent' : '');
   disconnectBLE(); disconnectWS();
+  try { localStorage.setItem('pec_mode', m); } catch (_) {}
   showToast(m === 'ble' ? 'Bluetooth mode' : 'WiFi mode');
 }
 
@@ -1061,12 +1062,32 @@ function forceUpdate() {
 }
 
 // === Init ===
-if (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-  document.getElementById('wsHost').value = window.location.hostname;
-  setMode('ws');
-} else {
-  setMode('ble');
-}
+// Pull the chart's LAN IP from the QR-encoded URL (?ip=192.168.x.x).
+// Do NOT auto-switch to WiFi mode — Bluetooth is the default per user preference.
+// If the user previously picked a mode, restore it. Otherwise default to BLE.
+(function initMode() {
+  const params = new URLSearchParams(window.location.search || '');
+  const ipFromQR = (params.get('ip') || '').trim();
+  const savedHost = localStorage.getItem('pec_ws_host');
+  const savedMode = localStorage.getItem('pec_mode'); // 'ble' or 'ws'
+
+  // Pre-fill the WiFi host field — IP from QR wins, then saved, then hostname
+  const hostInput = document.getElementById('wsHost');
+  if (hostInput) {
+    if (ipFromQR) {
+      hostInput.value = ipFromQR;
+      try { localStorage.setItem('pec_ws_host', ipFromQR); } catch (_) {}
+    } else if (savedHost) {
+      hostInput.value = savedHost;
+    } else if (window.location.hostname && !/^(localhost|127\.0\.0\.1|.*\.github\.io)$/i.test(window.location.hostname)) {
+      // Direct LAN access — use the page host
+      hostInput.value = window.location.hostname;
+    }
+  }
+
+  // Mode: saved choice wins, otherwise BLE (the user's preferred default)
+  setMode(savedMode === 'ws' ? 'ws' : 'ble');
+})();
 
 // First render of the mini-chart so the user sees something before any command.
 renderMiniChart();
