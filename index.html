@@ -976,18 +976,21 @@ async function connectBLE() {
     }
     bleDevice.addEventListener('gattserverdisconnected', () => {
       bleCmdChar = null;
-      // Try silent auto-reconnect a few times before giving up — the user
-      // already authorized this device, so no chooser dialog needed.
+      // Silent auto-reconnect: on some BLE chips (Spreadtrum/Unisoc) the phone
+      // rotates its MAC address every ~40s causing a brief link-layer drop.
+      // Reconnect as fast as possible without changing the UI so the user
+      // doesn't notice the transition.
       let attempts = 0;
       const tryReconnect = () => {
         if (!bleDevice) return;
         attempts++;
-        setConnStatus('connecting', `Reconnecting (${attempts})...`);
+        // Only show reconnecting UI after 3 failed attempts (>1s)
+        if (attempts > 3) setConnStatus('connecting', `Reconnecting (${attempts})...`);
         bleDevice.gatt.connect()
-          .then(server => bleReinit(server))
+          .then(server => bleReinit(server, true))
           .catch(err => {
-            if (attempts < 6) {
-              setTimeout(tryReconnect, 1500);
+            if (attempts < 12) {
+              setTimeout(tryReconnect, attempts <= 3 ? 300 : 1000);
             } else {
               setConnStatus('', 'Disconnected');
               showToast('BLE disconnected');
@@ -1008,10 +1011,10 @@ async function connectBLE() {
 
 // Initialize / re-initialize the GATT services after a successful connect.
 // Used by both first-time connect and the auto-reconnect path.
-async function bleReinit(server) {
+async function bleReinit(server, silent) {
   bleServer = server;
   const service = await server.getPrimaryService(BLE_SERVICE_UUID);
-  setConnStatus('connecting', 'Authenticating...');
+  if (!silent) setConnStatus('connecting', 'Authenticating...');
   const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
   await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
   bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
@@ -1029,7 +1032,7 @@ async function bleReinit(server) {
     console.warn('[BLE] status char subscribe failed:', e.message);
   }
   setConnStatus('connected', 'BLE Connected');
-  showToast('Connected via Bluetooth');
+  if (!silent) showToast('Connected via Bluetooth');
 }
 
 function disconnectBLE() {
