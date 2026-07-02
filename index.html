@@ -1014,7 +1014,13 @@ async function connectBLE() {
 async function bleReinit(server, silent) {
   bleServer = server;
   const service = await server.getPrimaryService(BLE_SERVICE_UUID);
-  if (!silent) setConnStatus('connecting', 'Authenticating...');
+  if (silent) {
+    // MAC rotation reconnect: minimal path — just get CMD char, skip auth + status
+    bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
+    setConnStatus('connected', 'BLE Connected');
+    return;
+  }
+  setConnStatus('connecting', 'Authenticating...');
   const authChar = await service.getCharacteristic(BLE_AUTH_CHAR_UUID);
   await authChar.writeValue(new TextEncoder().encode(PAIRING_CODE));
   bleCmdChar = await service.getCharacteristic(BLE_CMD_CHAR_UUID);
@@ -1032,7 +1038,7 @@ async function bleReinit(server, silent) {
     console.warn('[BLE] status char subscribe failed:', e.message);
   }
   setConnStatus('connected', 'BLE Connected');
-  if (!silent) showToast('Connected via Bluetooth');
+  showToast('Connected via Bluetooth');
 }
 
 function disconnectBLE() {
